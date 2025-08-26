@@ -1,0 +1,15 @@
+<div class="app">
+    <h1 class="auth-title">Регистрация</h1>
+
+    <form class="auth-form">
+        {{> Input id="register-email" type="email" placeholder="Почта" name="email"}}
+        {{> Input id="register-username" type="text" placeholder="Логин" name="login"}}
+        {{> Input id="register-name" type="text" placeholder="Имя" name="name"}}
+        {{> Input id="register-surname" type="text" placeholder="Фамилия" name="surname"}}
+        {{> Input id="register-tel" type="tel" placeholder="Телефон" name="tel"}}
+        {{> Input id="login-password" type="text" placeholder="Пароль" name="password"}}
+        {{> Input id="login-password-repeat" type="text" placeholder="Пароль (ещё раз)" name="password"}}
+
+    {{> Button id="submit-btn" text="Зарегистрироваться"}}
+    {{> Button id="switch-page-btn" text="Войти"}}
+</div>
