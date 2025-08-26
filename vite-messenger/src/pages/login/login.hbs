@@ -1,0 +1,11 @@
+<div class="app">
+    <h1 class="auth-title">Вход</h1>
+
+    <form class="auth-form">
+        {{> Input id="login-username" type="text" placeholder="Логин" name="login"}}
+        {{> Input id="login-password" type="text" placeholder="Пароль" name="password"}}
+    </form>
+
+    {{> Button id="submit-btn" text="Войти"}}
+    {{> Button id="switch-page-btn" text="Нет аккаунта?"}}
+</div>
