@@ -1,0 +1,271 @@
+// Imports
+
+@import 'variables';
+@import 'mixins';
+
+// General settings
+
+body, div, p, span, a, 
+h1, h2, h3, h4, h5, h6,
+input, textarea, select, button {
+    all: unset;
+    text-decoration: inherit;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500px;
+    color: $text-color;
+    margin: 0px;
+}
+
+.button, a { 
+    cursor: pointer;
+}
+
+a {
+    cursor: pointer;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    height: 100vh;          
+    width: 100vw;           
+}
+
+.flex-wrapper {
+    display: flex;
+}
+
+// Pages: login, register
+
+.auth-form {
+    align-items: center;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    padding: 50px 30px 30px;
+
+    &__title {
+        font-size: 20px;
+    }
+
+    &__input {
+        margin-top: 32px;
+        padding-left: 0px;
+        padding-bottom: 7px;
+        display: block;
+        width: 280px;
+        border: none;
+        outline: none;
+        border-bottom: 1px solid $primary-color;
+
+        &::placeholder {
+            font-weight: 500;
+            font-size: 13px;
+            color: #999;
+        }
+    }
+
+    &__btn {
+        @include button;
+    }
+
+    &__link {
+        all: unset;
+        text-decoration: inherit;
+        color: $primary-color;
+        margin-top: 14px;
+        font-size: 11px;
+    }
+}
+
+.login-btn {
+    margin-top: 169px;
+}
+
+.register-btn {
+    margin-top: 62px;
+}
+
+// Pages: 404, 500
+
+.error-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__title {
+        font-size: 40px;
+    } 
+
+    &__text {
+        margin: 20px 0 69px;
+        font-size: 20px;
+    }
+
+    &__link {
+        all: unset;
+        text-decoration: inherit;
+        color: $primary-color;
+        margin-top: 14px;
+        font-size: 11px;
+    }
+}
+
+// Pages: main
+
+.chats-menu {
+    width: 25%;
+    height: 100vh;  
+    background-color: $bg-white;
+    border-right: 1px solid $bg-white-border;
+
+    &-nav {
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1px solid $bg-white-border;
+        padding: 20px 10px 15px 10px;
+
+        &__profile-link {
+            text-align: right;
+            color: #999;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        &__form {
+
+            &_input {
+                background-color: #EFEFEF;
+                width: 100%;
+                padding: 10px 0;
+                border-radius: 5px;
+
+                &::placeholder {
+                    text-align: center;
+                }
+            }
+        }
+    }
+}
+
+.chats-picked {
+    width: 75%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    height: 100vh;          
+    width: 100vw;           
+}
+
+// Pages: profile, edit-profile, edit-password
+
+
+
+.link-back{
+    display: flex;
+    height: 100vh;  
+    width: 5%;
+    justify-content: center;
+    align-items: center; 
+    background-color: #FBFBFB;
+}
+
+.profile-data {
+    height: 100vh;  
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; 
+
+    &__avatar-link {
+        margin-bottom: 21px;
+    }
+
+    &__title {
+        font-size: 16px;    
+        color: $text-color;
+        font-weight: 600;
+    }
+
+    &__info {
+        display: flex;
+        justify-content: space-between;
+        min-width: 510px;
+        border-bottom: 1px solid $bg-white-border;
+        padding: 10px 0;
+
+        &:first-of-type {
+            margin-top: 60px;
+        }
+
+        &:last-child {
+            border-bottom: none !important;
+        }
+
+        &_title {
+            font-size: 13px;
+            color: $text-color;
+        }
+
+        &_text {
+            text-align: right;
+            font-size: 13px;
+            color: #999;
+        }
+    }
+
+    &__setting {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        margin-top: 60px;
+
+        a { 
+            display: block;
+            min-width: 510px;
+            padding: 10px 0;
+            border-bottom: 1px solid $bg-white-border;
+            color: $primary-color;
+        }
+
+        &_exit {
+            color: #FF0000 !important;
+            border-bottom: none;
+        }
+    }
+
+    &__submit-btn {
+        @include button;
+    }
+}
+
+#edit-profile-btn {
+    margin-top: 60px;
+}
+
+#edit-password-btn {
+    margin-top: 162px;
+}
+
+// All-pages Тестовая страница
+
+.cheatpages-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.cheatpages {
+    @include button;
+    color: $text-color;
+    border: 1px solid $text-color;
+    font-size: 15px;
+    margin: 0 15px;
+    cursor: pointer;
+}

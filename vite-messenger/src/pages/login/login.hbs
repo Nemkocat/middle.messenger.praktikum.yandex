@@ -1,11 +1,12 @@
-<div class="app">
-    <h1 class="auth-title">Вход</h1>
-
+<div class="container">
     <form class="auth-form">
-        {{> Input id="login-username" type="text" placeholder="Логин" name="login"}}
-        {{> Input id="login-password" type="text" placeholder="Пароль" name="password"}}
-    </form>
+        <h1 class="auth-form__title">Вход</h1>
 
-    {{> Button id="submit-btn" text="Войти"}}
-    {{> Button id="switch-page-btn" text="Нет аккаунта?"}}
+        {{> Input id="login-username" class="auth-form__input" type="login" placeholder="Логин" name="login"}}
+        {{> Input id="login-password" class="auth-form__input" type="password" placeholder="Пароль" name="password"}}
+        
+        {{> Button id="submit-btn"  class="auth-form__btn login-btn" text="Авторизироваться"}}
+
+        {{> Link href="#" class="auth-form__link" page="register" text="Нет аккаунта?"}}
+    </form>
 </div>

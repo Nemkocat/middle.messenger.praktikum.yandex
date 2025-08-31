@@ -1,7 +1,6 @@
-import './styles/main.scss';
-import App from './app.js';
+import App from './App.js';
 
+// Инициализация приложения после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
-  const app = new App();
-  app.render();
+    new App();
 });

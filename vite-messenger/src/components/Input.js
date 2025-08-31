@@ -1,1 +1,3 @@
-export default `<input id="{{id}}" type="{{type}}" class="auth-form__input" placeholder="{{placeholder}}" name="{{name}}" required>`;
+export default `
+<input id="{{id}}" type="{{type}}" class="{{class}}" placeholder="{{placeholder}}" name="{{name}}" required>
+`; 

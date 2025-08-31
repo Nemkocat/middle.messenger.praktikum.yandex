@@ -1,0 +1,23 @@
+<main class="flex-wrapper">
+    <div class="chats-menu">
+        <nav class="chats-menu-nav">
+            <!-- У ТЕБЯ ССЫЛКА РАСТЯГИВАЕТСЯ НА ВСЮ ШИРИНУ -->
+            {{> Link href="#" class="chats-menu-nav__profile-link" page="profile" img="/images/profile-arrow.png" img-class="chats-menu-nav__profile-link_arrow" img-alt=">" text="Профиль"}}
+            
+            <form class="chats-menu-nav__form">
+                {{> Input id="chats-search" class="chats-menu-nav__form_input" type="text" placeholder="Поиск" name="search"}}
+            </form>
+        </nav>
+
+        <div class="chats-menu__chats">
+            <!-- Заглушка -->
+        </div>
+    </div>
+
+    <!-- Заглушка -->
+
+    <div class="chats-picked ">
+        <!-- Контейнер с поставление по серединам, в основе это comtainer, переименуй его на более подходящее и переиспользуй. Мб миксы в scss? -->
+        <p class="chats-picked__no-chat">Выберите чат чтобы отправить сообщение</p>
+    </div>
+</main>
