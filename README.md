@@ -10,17 +10,22 @@ https://www.figma.com/design/jF5fFFzgGOxQeB4CmKWTiE/Chat_external_link?node-id=0
 
 - Скачиваем архив и разархивируем
 - Открываем терминал
-- Нам нужно перейти в директорию: ../Practicum/vite-messenger
-- На компьютере должен быть установлен Node.js
+- Переходим в папку проекта
+- На компьютере должен быть установлен Node.js для выполнения команд npm
+- Выполняем установку Vite: npm install --save-dev vite
 - Выполняем команду: npm run dev 
 - Открываем в браузере: http://localhost:3000/
 
 
 ВСЕ СТРАНИЦЫ:
 
+При заходе на сайт доступна сразу страница с ссылками на все страницы, ей не будет в итоговой версии проекта. 
+
+Стандартное отображение проекта можно включить:
+
 - Заходим в App.js
-- В строке 30 меняем profile на cheatPage (currentPage: 'profile', => currentPage: 'cheatPage',)
+- В строке 30 меняем cheatPage на profile (currentPage: 'cheatPage', => currentPage: 'profile',)
 - npm run build
 - npm run start
-- кайфуем
+
 
