@@ -129,3 +129,4 @@ export default class App {
         this.appElement.appendChild(fragment);
     }
 }
+

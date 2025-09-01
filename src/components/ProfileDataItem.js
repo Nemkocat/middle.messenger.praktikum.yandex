@@ -9,3 +9,4 @@ export default `
            {{#unless editable}}readonly{{/unless}}>
 </div>
 `;
+
