@@ -19,7 +19,14 @@ export default defineConfig({
       },
     },
   },
-  server: { port: '3000' },
+  server: { 
+    port: '3000',
+    historyApiFallback: true,
+   },
+  preview: { 
+    port: '3000',
+    historyApiFallback: true,
+  },
   css: {
     preprocessorOptions: {
       scss: {
