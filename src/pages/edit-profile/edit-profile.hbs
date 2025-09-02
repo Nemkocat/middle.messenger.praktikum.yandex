@@ -1,0 +1,20 @@
+<div class="flex-wrapper">
+    <div class="link-back">
+        {{> Link href="#" class="chats-menu-nav__profile-link" page="profile" img="/images/arrow.png" img-class="chats-menu-nav__profile-link_img" img-alt="#" text=""}}
+    </div>
+    <form class="profile-data">
+        {{> Link href="#" class="profile-data__avatar-link" page="#" img="/images/default-avatar.png" img-class="profile-data__avatar-link_img" img-alt="#" text=""}}
+
+        <div>
+            {{> ProfileDataItem title="Почта" value="pochta@yandex.ru" name="email" type="email" editable=true}}
+            {{> ProfileDataItem title="Логин" value="ivanivanov" name="login" type="text" editable=true}}
+            {{> ProfileDataItem title="Имя" value="Иван" name="first_name" type="text" editable=true}}
+            {{> ProfileDataItem title="Фамилия" value="Иванов" name="second_name" type="text" editable=true}}
+            {{> ProfileDataItem title="Имя в чате" value="Иван" name="nickname" type="text"  editable=true}}
+            {{> ProfileDataItem title="Телефон" value="+7 (909) 123 45 67" name="phone" type="tel" editable=true}}
+        </div>
+
+        {{> Button id="edit-profile-btn" class="profile-data__submit-btn" text="Сохранить"}}
+    </form>
+</div>
+

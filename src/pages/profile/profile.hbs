@@ -1,0 +1,26 @@
+<div class="flex-wrapper">
+    <div class="link-back">
+        {{> Link href="#" class="chats-menu-nav__profile-link" page="main" img="/images/arrow.png" img-class="chats-menu-nav__profile-link_img" img-alt="#" text=""}}
+    </div>
+    <form class="profile-data">
+        {{> Link href="#" class="profile-data__avatar-link" page="#" img="/images/default-avatar.png" img-class="profile-data__avatar-link_img" img-alt="#" text=""}}
+        <h2 class="profile-data__title">Иван</h2>
+
+        <div>
+            {{> ProfileDataItem title="Почта" value="pochta@yandex.ru" name="email" type="email" editable=false}}
+            {{> ProfileDataItem title="Логин" value="ivanivanov" name="login" type="text" editable=false}}
+            {{> ProfileDataItem title="Имя" value="Иван" name="first_name" type="text" editable=false}}
+            {{> ProfileDataItem title="Фамилия" value="Иванов" name="second_name" type="text" editable=false}}
+            {{> ProfileDataItem title="Имя в чате" value="Иван" name="nickname" type="text"  editable=false}}
+            {{> ProfileDataItem title="Телефон" value="+7 (909) 123 45 67" name="phone" type="tel" editable=false}}
+        </div>
+
+        <div class="profile-data__setting">
+            {{> Link href="#" class="profile-data__setting_data-edit" page="editProfile" text="Изменить данные"}}
+            {{> Link href="#" class="profile-data__setting_password-edit" page="editPassword" text="Изменить пароль"}}
+            {{> Link href="#" class="profile-data__setting_exit" page="login" text="Выйти"}}
+        </div>
+    </form>
+</div>
+
+

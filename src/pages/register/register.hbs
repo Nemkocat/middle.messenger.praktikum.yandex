@@ -1,0 +1,16 @@
+<div class="container">
+    <form class="auth-form">
+        <h1 class="auth-form__title">Регистрация</h1>
+        {{> Input id="register-email" class="auth-form__input" type="email" placeholder="Почта" name="email"}}
+        {{> Input id="register-username" class="auth-form__input" type="text" placeholder="Логин" name="login"}}
+        {{> Input id="register-name" class="auth-form__input" type="text" placeholder="Имя" name="first_name"}}
+        {{> Input id="register-surname" class="auth-form__input" type="text" placeholder="Фамилия" name="second_name"}}
+        {{> Input id="register-tel" class="auth-form__input" type="tel" placeholder="Телефон" name="phone"}}
+        {{> Input id="login-password" class="auth-form__input" type="password" placeholder="Пароль" name="password"}}
+        {{> Input id="login-password-repeat" class="auth-form__input" type="password" placeholder="Пароль (ещё раз)" name="password"}}
+
+        {{> Button id="submit-btn" class="auth-form__btn register-btn" text="Зарегистрироваться"}}
+        {{> Link href="#" class="auth-form__link" data-page="login" text="Войти"}}
+    </form>
+</div>
+
