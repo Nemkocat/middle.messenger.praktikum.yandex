@@ -261,12 +261,26 @@ a {
     margin: 0 auto;
 }
 
-.cheatpages {
+.cheatpages-list-wrapper {
+    margin: 0 auto;
+}
+
+.cheatpages-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.cheatpages-list__page_link {
     @include button;
     color: $text-color;
     border: 1px solid $text-color;
     font-size: 15px;
-    margin: 0 15px;
     cursor: pointer;
+    padding: 15px;
+}
+
+.cheatpages-list__page_link {
+    display: inline-block;
+    margin-top: 20px;
 }
 
