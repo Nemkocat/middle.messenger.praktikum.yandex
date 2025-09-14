@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    // Включает все строгие проверки
+    "strict": true,
+    "strictNullChecks": true,     // Строгая проверка null/undefined
+    "noUnusedLocals": true,       // Запрещает неиспользуемые переменные
+    "noUnusedParameters": true,   // Запрещает неиспользуемые параметры
+    "sourceMap": true,            // Генерирует source maps для отладки
+
+    
+                                  // Настройки путей для импортов
+    "baseUrl": ".",               // Базовая директория для путей
+    "paths": {
+      "@/*": ["src/*"]            // Алиас для удобных импортов
+    }
+  },
+  "include": [
+    "src/**/*"                    // Какие файлы обрабатывать
+  ],
+  "exclude": [
+    "node_modules",               // Что исключить из обработки
+    "dist"
+  ]
+}

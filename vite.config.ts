@@ -11,8 +11,6 @@ export default defineConfig({
   ],
   base: './',
   build: {
-    // assetsDir: 'static', 
-    // outDir: 'dist',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
@@ -20,12 +18,10 @@ export default defineConfig({
     },
   },
   server: { 
-    port: '3000',
-    historyApiFallback: true,
+    port: 3000,
    },
   preview: { 
-    port: '3000',
-    historyApiFallback: true,
+    port: 3000,
   },
   css: {
     preprocessorOptions: {

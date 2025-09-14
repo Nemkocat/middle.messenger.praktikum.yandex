@@ -1,24 +1,134 @@
 <main class="flex-wrapper">
     <div class="chats-menu">
         <nav class="chats-menu-nav">
-            <!-- У ТЕБЯ ССЫЛКА РАСТЯГИВАЕТСЯ НА ВСЮ ШИРИНУ -->
             {{> Link href="#" class="chats-menu-nav__profile-link" page="profile" img="/images/profile-arrow.png" img-class="chats-menu-nav__profile-link_arrow" img-alt=">" text="Профиль"}}
             
             <form class="chats-menu-nav__form">
                 {{> Input id="chats-search" class="chats-menu-nav__form_input" type="text" placeholder="Поиск" name="search"}}
             </form>
+
+{{!-- !!!!!!!!!!!!!!!!!!!!!
+            НЕ ЗАБУДЬ СДЕЛАТЬ КЛМПОНЕНТ ИЗ ЭТОГО!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!! --}}
+            <ul class="chats-menu-nav__chats">
+                <li class="chat-card">
+                    <div class="chat-card__avatar-wrapper">
+                        <img src="/images/default-avatar.png" class="chat-card__avatar-wrapper_image" alt="Фото профиля">
+                    </div>
+                    <div class="chat-card__text">
+                        <h4 class="chat-card__text_name">Имя</h4>
+                        <p class="chat-card__text_last-message">Последнее сообщение</p>
+                    </div>
+                    <div class="chat-card__numbers">
+                        <time class="chat-card__numbers_message-time">10:49</time>
+                        <span class="chat-card__numbers_unread-count">1</span>
+                    </div>
+                </li>
+                <li class="chat-card">
+                    <div class="chat-card__avatar-wrapper">
+                        <img src="/images/default-avatar.png" class="chat-card__avatar-wrapper_image" alt="Фото профиля">
+                    </div>
+                    <div class="chat-card__text">
+                        <h4 class="chat-card__text_name">Имя</h4>
+                        <p class="chat-card__text_last-message">Последнее сообщение</p>
+                    </div>
+                    <div class="chat-card__numbers">
+                        <time class="chat-card__numbers_message-time">10:49</time>
+                        <span class="chat-card__numbers_unread-count">1</span>
+                    </div>
+                </li>
+                <li class="chat-card">
+                    <div class="chat-card__avatar-wrapper">
+                        <img src="/images/default-avatar.png" class="chat-card__avatar-wrapper_image" alt="Фото профиля">
+                    </div>
+                    <div class="chat-card__text">
+                        <h4 class="chat-card__text_name">Имя</h4>
+                        <p class="chat-card__text_last-message">Последнее сообщение</p>
+                    </div>
+                    <div class="chat-card__numbers">
+                        <time class="chat-card__numbers_message-time">10:49</time>
+                        <span class="chat-card__numbers_unread-count">1</span>
+                    </div>
+                </li>
+                <li class="chat-card">
+                    <div class="chat-card__avatar-wrapper">
+                        <img src="/images/default-avatar.png" class="chat-card__avatar-wrapper_image" alt="Фото профиля">
+                    </div>
+                    <div class="chat-card__text">
+                        <h4 class="chat-card__text_name">Имя</h4>
+                        <p class="chat-card__text_last-message">Последнее сообщение</p>
+                    </div>
+                    <div class="chat-card__numbers">
+                        <time class="chat-card__numbers_message-time">10:49</time>
+                        <span class="chat-card__numbers_unread-count">1</span>
+                    </div>
+                </li>
+                <li class="chat-card">
+                    <div class="chat-card__avatar-wrapper">
+                        <img src="/images/default-avatar.png" class="chat-card__avatar-wrapper_image" alt="Фото профиля">
+                    </div>
+                    <div class="chat-card__text">
+                        <h4 class="chat-card__text_name">Имя</h4>
+                        <p class="chat-card__text_last-message">Последнее сообщение</p>
+                    </div>
+                    <div class="chat-card__numbers">
+                        <time class="chat-card__numbers_message-time">10:49</time>
+                        <span class="chat-card__numbers_unread-count">1</span>
+                    </div>
+                </li>
+                <li class="chat-card">
+                    <div class="chat-card__avatar-wrapper">
+                        <img src="/images/default-avatar.png" class="chat-card__avatar-wrapper_image" alt="Фото профиля">
+                    </div>
+                    <div class="chat-card__text">
+                        <h4 class="chat-card__text_name">Имя</h4>
+                        <p class="chat-card__text_last-message">Последнее сообщение</p>
+                    </div>
+                    <div class="chat-card__numbers">
+                        <time class="chat-card__numbers_message-time">10:49</time>
+                        <span class="chat-card__numbers_unread-count">1</span>
+                    </div>
+                </li>
+                <li class="chat-card">
+                    <div class="chat-card__avatar-wrapper">
+                        <img src="/images/default-avatar.png" class="chat-card__avatar-wrapper_image" alt="Фото профиля">
+                    </div>
+                    <div class="chat-card__text">
+                        <h4 class="chat-card__text_name">Имя</h4>
+                        <p class="chat-card__text_last-message">Последнее сообщение</p>
+                    </div>
+                    <div class="chat-card__numbers">
+                        <time class="chat-card__numbers_message-time">10:49</time>
+                        <span class="chat-card__numbers_unread-count">2</span>
+                    </div>
+                </li>
+            </ul>
         </nav>
+    </div>
 
-        <div class="chats-menu__chats">
-            <!-- Заглушка -->
+    <div class="picked-chat">
+         
+        <!-- Заглушка -->
+
+        
+        <div class="picked-chat__nothing-picked">
+            <p class="picked-chat__nothing-picked_text">Выберите чат чтобы отправить сообщение</p>
         </div>
-    </div>
 
-    <!-- Заглушка -->
+    <form class="picked-chat__message-form">
+        <label for="message-file" class="picked-chat__message-form_file-img">
+            <img src="/images/clip.png" alt="Прикрепить файл">
+        </label>
+        {{> Input id="message-file" class="picked-chat__message-form_file-input-hidden" type="file" name="file"}}
 
-    <div class="chats-picked ">
-        <!-- Контейнер с поставление по серединам, в основе это comtainer, переименуй его на более подходящее и переиспользуй. Мб миксы в scss? -->
-        <p class="chats-picked__no-chat">Выберите чат чтобы отправить сообщение</p>
-    </div>
+        {{> Input id="new-message" class="picked-chat__message-form_input" type="text" placeholder="Сообщение" name="message" required="required"}}
+        
+        <button class="picked-chat__message-form_send-message-btn" type="send">
+            <img src="/images/send-arrow.png" alt="Отправить сообщение">
+        </button>
+    </form>
 </main>
 
