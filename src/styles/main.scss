@@ -17,24 +17,12 @@ input, textarea, select, button {
     margin: 0px;
 }
 
-// Убираем вертикальный скролл
-
-body, html {
-    height: 100%;
-    overflow: hidden;
-}
-
 .button, a { 
     cursor: pointer;
 }
 
 a {
     cursor: pointer;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
 }
 
 .container {
@@ -47,10 +35,6 @@ ul {
 
 .flex-wrapper {
     display: flex;
-}
-
-.hide {
-    display: none !important;
 }
 
 // Pages: login, register
@@ -106,7 +90,7 @@ ul {
 
 // Pages: 404, 500
 
-.error-msg {
+.error-page {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -140,7 +124,8 @@ ul {
     &-nav {
         display: flex;
         flex-direction: column;
-        padding: 20px 10px 15px 10px;
+        border-bottom: 1px solid $bg-white-border;
+        padding: 20px 10px 0px 10px;
 
         &__profile-link {
             text-align: right;
@@ -223,8 +208,6 @@ ul {
     }
 }
 
-
-
 .picked-chat {
     display: flex;
     flex-direction: column;
@@ -275,9 +258,7 @@ ul {
     }
 }
 
-
 // Pages: profile, edit-profile, edit-password
-
 
 
 .link-back{
@@ -334,7 +315,7 @@ ul {
         }
     }
 
-    &__setting {
+    &__settings {
         display: flex;
         flex-direction: column;
         text-align: left;
@@ -381,16 +362,18 @@ ul {
     margin: 0 auto;
 }
 
-.cheatpages-list__page_link {
+.cheatpages-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.cheatpages-list__page_link { //cheat-page__link
     @include button;
     color: $text-color;
     border: 1px solid $text-color;
     font-size: 15px;
     cursor: pointer;
     padding: 15px;
-}
-
-.cheatpages-list__page_link {
     display: inline-block;
     margin-top: 20px;
 }

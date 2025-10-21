@@ -1,10 +1,39 @@
-export default `
-<a href="{{href}}" class="{{class}}" data-page="{{page}}">
+import Block from "../core/block";
 
-{{text}}
+interface LinkProps {
+  href?: string;
+  class?: string;
+  page?: string;
+  text: string;
+  img?: string;
+  imgClass?: string;
+  imgAlt?: string;
+  onClick?: (e: Event) => void;
+}
 
-{{#if img}}<img src="{{img}}" class="{{img-class}}" alt="{{img-alt}}">{{/if}}
+export default class Link extends Block {
+  constructor(props: LinkProps) {
+    super("a", {
+      ...props,
+      attrs: {
+        href: props.href || "#",
+        class: props.class ,
+        "data-page": props.page || "",
+        img: props.img || "",
+        imgClass: props.imgClass || "",
+        imgAlt: props.imgAlt || "img"
+      },
+      events: {
+        click: props.onClick,
+      },
+    });
+  }
 
-</a>
-`;
+  render(): string {
+    return `
+      {{text}}
+      {{#if img}}<img src="{{img}}" class="{{imgClass}}" alt="{{imgAlt}}">{{/if}}
+    `;
+  }
+}
 

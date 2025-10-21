@@ -1,4 +1,4 @@
 declare module '*.hbs?raw' {
-  const content: string;
-  export default content;
+    const template: string;
+    export default template;
 }

@@ -1,148 +1,132 @@
-import * as Handlebars from 'handlebars';
-import { LoginPage } from './pages/login/index';
-import { RegisterPage } from './pages/register/index';
-import { Error404Page } from './pages/404/index';
-import { Error500Page } from './pages/500/index';
-import { MainPage } from './pages/main/index';
-import { ProfilePage } from './pages/profile/index';
-import { EditPasswordPage } from './pages/edit-password/index';
-import { EditProfilePage } from './pages/edit-profile/index';
-import { CheatPage } from './pages/allpages/index';
+import renderDOM from './core/renderDom';
+import LoginPage from './pages/login/login.ts';
+import RegisterPage from './pages/register/register.ts';
+import Error404Page from './pages/404/404.ts';
+import Error500Page from './pages/500/505.ts';
+import MainPage from './pages/main/main.ts';
+import ProfilePage from './pages/profile/profile.ts';
+import EditPasswordPage from './pages/editPassword/editPassword.ts';
+import EditProfilePage from './pages/editProfile/editProfile.ts';
+import CheatPage from './pages/allpages/cheatPage.ts';
+import mockChats from './pages/main/mockChats';
 
-// Импорт и регистрация компонентов для регистрации в Handlebars
-import Button from './components/Button';
-import Input from './components/Input';
-import Link from './components/Link';
-import ProfileDataItem from './components/ProfileDataItem';
+// Типы для TypeScript
+import Block from './core/block';
 
-Handlebars.registerPartial('Button', Button);
-Handlebars.registerPartial('Input', Input);
-Handlebars.registerPartial('Link', Link);
-Handlebars.registerPartial('ProfileDataItem', ProfileDataItem);
+// Ограничения для выбора страницы
+type PageKey = 
+    | 'login'
+    | 'register'
+    | 'error404'
+    | 'error500'
+    | 'main'
+    | 'profile'
+    | 'editProfile'
+    | 'editPassword'
+    | 'cheatPage';
 
-// Определение интерфейса для состояния приложения
-interface AppState {
-  currentPage: string;
-}
+// Состояние страницы приложения
+type AppState = {
+    currentPage: PageKey;
+};
 
-// Определение интерфейса для страниц
-interface PagesCollection {
-  [key: string]: string;
-}
+
 
 export default class App {
-  // Объявление свойств класса с типами
-  private state: AppState;
-  private appElement: HTMLElement;
-  private Pages: PagesCollection;
+    private state: AppState;
+    private appElement: HTMLElement | null;
+    private currentPageInstance: Block | null = null;
 
-  constructor() {
-    // Инициализация состояния приложения
-    this.state = {
-      currentPage: 'main',
-    };
+    constructor() {
+        // Инициализация состояния приложения
+        this.state = {
+            currentPage: 'main', 
+            // Текущая активная страница, весь список доступных страниц внутри PageKey 
+        };
+        
+        // Получение корневого элемента приложения
+        this.appElement = document.getElementById('app');
+
+        if (this.appElement === null) {
+            throw new Error('App не найден, перезагрузите страницу');
+        } 
     
-    // Получение корневого элемента приложения
-    const appElement = document.getElementById('app');
-    if (!appElement) {
-      throw new Error('Element with id "app" not found');
-    }
-    this.appElement = appElement;
-    
-    // Коллекция доступных страниц
-    this.Pages = {
-      LoginPage,
-      RegisterPage,
-      Error404Page,
-      Error500Page,
-      MainPage,
-      ProfilePage,
-      EditProfilePage,
-      EditPasswordPage,
-      CheatPage
-    };
-  
-    // Запуск инициализации приложения
-    this.init();
-  }
-
-  // Инициализация приложения
-  private init(): void {
-    this.render(); // Первоначальный рендеринг
-    this.setupEventListeners(); // Настройка обработчиков событий
-  }
-
-  // Настройка обработчиков событий
-  private setupEventListeners(): void {
-    // Обработка кликов по ссылкам с data-page атрибутом
-    this.appElement.addEventListener('click', (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a[data-page]') as HTMLAnchorElement;
-      if (link) {
-        e.preventDefault(); // Предотвращаем переход по ссылке
-        this.changePage(link.dataset.page as string); // Меняем страницу
-      }
-    });
-  }
-
-  // Метод для смены страницы
-  private changePage(page: string): void {
-    this.state.currentPage = page; // Обновляем состояние
-    this.render(); // Перерисовываем интерфейс
-  }
-
-  // Основной метод рендеринга
-  private render(): void {
-    let template: HandlebarsTemplateDelegate;
-    
-    // Выбор шаблона в зависимости от текущей страницы
-    switch (this.state.currentPage) {
-      case 'login':
-        template = Handlebars.compile(this.Pages.LoginPage);
-        break;
-      case 'register':
-        template = Handlebars.compile(this.Pages.RegisterPage);
-        break;
-      case 'error404':
-        template = Handlebars.compile(this.Pages.Error404Page);
-        break;
-      case 'error500':
-        template = Handlebars.compile(this.Pages.Error500Page);
-        break;
-      case 'main':
-        template = Handlebars.compile(this.Pages.MainPage);
-        break;
-      case 'profile':
-        template = Handlebars.compile(this.Pages.ProfilePage);
-        break;
-      case 'editProfile':
-        template = Handlebars.compile(this.Pages.EditProfilePage);
-        break;
-      case 'editPassword':
-        template = Handlebars.compile(this.Pages.EditPasswordPage);
-        break;
-      case 'cheatPage':
-        template = Handlebars.compile(this.Pages.CheatPage);
-        break;
-      default:
-        template = Handlebars.compile(this.Pages.LoginPage);
+        // Запуск инициализации приложения
+        this.init();
     }
 
-    // Безопасное обновление DOM
-    this.safeRender(template({}));
-  }
-
-  // Безопасный метод рендеринга
-  private safeRender(htmlString: string): void {
-    // Создаём DocumentFragment для безопасного парсинга HTML
-    const fragment = document.createRange().createContextualFragment(htmlString);
-    
-    // Очищаем основной контейнер
-    while (this.appElement.firstChild) {
-      this.appElement.removeChild(this.appElement.firstChild);
+    // Инициализация приложения
+    init() {
+        this.render(); // Первоначальный рендеринг
+        this.setupEventListeners(); // Настройка обработчиков событий
     }
-    
-    // Добавляем все элементы из фрагмента в основной контейнер
-    this.appElement.appendChild(fragment);
-  }
+
+    // Настройка обработчиков событий
+    setupEventListeners() {
+        if (!this.appElement) return; // Проверка на null
+        
+        // Обработка кликов по ссылкам с data-page атрибутом
+        this.appElement.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement; 
+            const link = target.closest('a[data-page]') as HTMLAnchorElement | null;
+
+            if (link && link.dataset.page) { // Проверка на всякий случай 0_0
+                e.preventDefault(); // Предотвращаем переход по ссылке
+                this.changePage(link.dataset.page as PageKey); // Меняем страницу, насильно приводим к типу PageKey потомучто выше использованы union типы, если будет ошибка, то будет выброшено исключение которое ловится в changePage
+            }
+        });
+    }
+
+    // Метод для смены страницы
+    changePage(page: PageKey) {
+        const validPages: PageKey[] = ['login', 'register', 'error404', 'error500', 'main', 'profile', 'editProfile', 'editPassword', 'cheatPage'];
+
+        if (!validPages.includes(page)) { // Если такой странице нет кинет пользователя на 404
+            this.state.currentPage = 'error404';
+        } else {
+            this.state.currentPage = page; // Обновляем состояние
+        }
+        
+        this.render(); // Перерисовываем интерфейс
+    }
+
+    // Получение класса страницы по ключу
+    private getPageClass(page: PageKey): new (props?: any) => Block {
+        switch (page) {
+            case 'login':
+                return LoginPage;
+            case 'register':
+                return RegisterPage;
+            case 'error404':
+                return Error404Page;
+            case 'error500':
+                return Error500Page;
+            case 'main':
+                return MainPage;
+            case 'profile':
+                return ProfilePage;
+            case 'editProfile':
+                return EditProfilePage;
+            case 'editPassword':
+                return EditPasswordPage;
+            case 'cheatPage':
+                return CheatPage;
+            default:
+                return LoginPage;
+        }
+    }
+
+    // Основной метод рендеринга
+    render() {
+        // Создаем экземпляр страницы
+        const PageClass = this.getPageClass(this.state.currentPage);
+        
+        // Передаем данные чатов для MainPage
+        const pageProps = this.state.currentPage === 'main' ? { chats: mockChats } : {};
+        this.currentPageInstance = new PageClass(pageProps);
+        
+        // Монтируем страницу в DOM
+        renderDOM(this.currentPageInstance);
+    }
 }
+
