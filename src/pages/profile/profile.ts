@@ -8,7 +8,7 @@ export default class ProfilePage extends Block {
   constructor(props: any = {}) {
     super("div", {
       ...props,
-      Avatar: new Avatar({
+      AvatarComponent: new Avatar({
         class: "profile__avatar",
         name: "avatar",
         img: "/images/default-avatar.png",

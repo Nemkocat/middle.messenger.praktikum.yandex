@@ -10,11 +10,11 @@ h1, h2, h3, h4, h5, h6,
 input, textarea, select, button {
     all: unset;
     text-decoration: inherit;
-    font-family: 'Inter';
+    font-family: Inter, sans-serif;
     font-style: normal;
     font-weight: 500px;
     color: $text-color;
-    margin: 0px;
+    margin: 0;
 }
 
 .button, a { 
@@ -52,7 +52,7 @@ a {
 
     &__input {
         margin-top: 32px;
-        padding-left: 0px;
+        padding-left: 0;
         padding-bottom: 7px;
         display: block;
         width: 280px;
@@ -115,6 +115,8 @@ a {
 
 // Pages: main
 
+// Левая панель
+
 .chats-menu {
     width: 25%;
     height: 100vh;  
@@ -125,7 +127,7 @@ a {
         display: flex;
         flex-direction: column;
         border-bottom: 1px solid $bg-white-border;
-        padding: 20px 10px 0px 10px;
+        padding: 20px 10px 0;
 
         &__profile-link {
             text-align: right;
@@ -135,7 +137,6 @@ a {
         }
 
         &__form {
-
             &_input {
                 background-color: #EFEFEF;
                 width: 100%;
@@ -159,6 +160,7 @@ a {
 
     &__avatar-wrapper {
         margin-right: 3%;
+
         &_image {
             max-width: 72px;
             max-height: 72px;
@@ -208,28 +210,41 @@ a {
     }
 }
 
+
+
+// Правая панель
+
 .picked-chat {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
+    background-color: #f8f8f8;
+    height: 100vh;
 
-    // Заглушка
     &__nothing-picked {
         display: flex;
         justify-content: center;
-        align-items: center;    
-        height: 94%;          
-        width: 75vw;        
+        align-items: center;
+        flex-grow: 1;
+        color: #999;
+        font-size: 16px;
+        text-align: center;
+        padding: 20px;
+
+        &_text {
+        margin: 0;
+        }
     }
 
-    // Форма
     &__message-form {
-            display: flex;
-            justify-content: space-between;
-            height: 6%;
-            background-color: #f5f5f5;
-            border-top: 1px solid #eaeaea;
-            padding: 10px 20px;
-            align-items: center;
+        display: flex;
+        justify-content: space-between;
+        height: 6%;
+        background-color: #f5f5f5;
+        border-top: 1px solid #eaeaea;
+        padding: 10px 20px;
+        align-items: center;
+
         &_file-img {
             cursor: pointer;
             margin-right: 1%;
@@ -257,6 +272,129 @@ a {
         }
     }
 }
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #eaeaea;
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #e0e0e0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__user-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  &__status {
+    margin: 0;
+    font-size: 12px;
+    color: #999;
+  }
+
+  &__menu {
+    display: flex;
+    align-items: center;
+  }
+
+  &__menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+
+  &__menu-dots {
+    font-size: 18px;
+    color: #666;
+    line-height: 1;
+  }
+}
+
+.chat-messages {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f8f8f8;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  overflow-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+
+  // Сообщения собеседника (слева)
+  align-self: flex-start;
+  background-color: #e0e0e0;
+  color: #000;
+
+  &--mine {
+    // Мои сообщения (справа)
+    align-self: flex-end;
+    background-color: #36f;
+    color: #fff;
+  }
+
+  &__content {
+    margin: 0;
+    padding: 0;
+    overflow-wrap: break-word;
+  }
+
+  &__time {
+    font-size: 10px;
+    color: rgb(0 0 0 / 60%);
+    margin-top: 4px;
+    align-self: flex-end;
+
+    .message--mine & {
+      color: rgb(255 255 255 / 70%);
+    }
+  }
+}
+
 
 // Pages: profile, edit-profile, edit-password
 
@@ -312,7 +450,28 @@ a {
             text-align: right;
             font-size: 13px;
             color: #999;
+            border: none;
+            outline: none;
+            background: transparent;
+            transition: border-color 0.2s ease;
+
+            &:focus {
+                border-bottom: 1px solid $primary-color;
+            }
+
+            &--error {
+                border-bottom: 1px solid #f44;
+                color: #f44;
+            }
         }
+    }
+
+    &__error {
+        color: #f44;
+        font-size: 11px;
+        margin-top: 4px;
+        text-align: right;
+        display: block;
     }
 
     &__settings {
@@ -330,7 +489,7 @@ a {
         }
 
         &_exit {
-            color: #FF0000 !important;
+            color: #F00 !important;
             border-bottom: none;
         }
     }
@@ -367,8 +526,9 @@ a {
     padding: 0;
 }
 
-.cheatpages-list__page_link { //cheat-page__link
+.cheatpages-list__page_link { // cheat-page__link
     @include button;
+
     color: $text-color;
     border: 1px solid $text-color;
     font-size: 15px;
@@ -376,5 +536,57 @@ a {
     padding: 15px;
     display: inline-block;
     margin-top: 20px;
+}
+
+// Input validation styles CURSOR
+.input {
+    position: relative;
+    margin-bottom: 16px;
+
+    &__container {
+        display: block;
+        position: relative;
+    }
+
+    &__element {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+        }
+
+        &--error {
+            border-color: #f44;
+        }
+    }
+
+    &__label {
+        position: absolute;
+        top: -8px;
+        left: 8px;
+        background: white;
+        padding: 0 4px;
+        font-size: 12px;
+        color: #666;
+    }
+
+    &__error {
+        color: #f44;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    &--error {
+        .input__element {
+            border-color: #f44;
+        }
+    }
 }
 

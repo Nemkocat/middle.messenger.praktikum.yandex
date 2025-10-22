@@ -6,13 +6,13 @@
   color: $text-color;
   font-size: 13px;
   text-align: center;
-  padding: 12px 0px;
+  padding: 12px 0;
   outline: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
   
-  &:hover {
-    background: darken($bg-color, 10%);
-  }
+  // &:hover {
+  //   background: color.adjust($bg-color);
+  // }
 }
 

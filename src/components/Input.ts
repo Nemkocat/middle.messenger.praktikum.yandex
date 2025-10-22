@@ -7,20 +7,19 @@ interface InputProps {
   placeholder?: string;
   name?: string;
   required?: boolean;
+  error?: string;
+  value?: string;
   onChange?: (e: Event) => void;
   onBlur?: (e: Event) => void;
 }
 
 export default class Input extends Block {
   constructor(props: InputProps) {
-    super("input", {
+    super("div", {
       ...props,
+      className: "input",
       attrs: {
-        class: props.class , 
-        type: props.type || "text",
-        placeholder: props.placeholder || "",
-        name: props.name || "",
-        required: props.required || false,
+        class: props.class || "input",
       },
       events: {
         change: props.onChange,
@@ -30,7 +29,25 @@ export default class Input extends Block {
   }
 
   render(): string {
-    return ``;
+    const errorClass = this.props.error ? "input--error" : "";
+    const inputClass = `input__element ${errorClass}`.trim();
+    
+    return `
+      <div class="input ${errorClass}">
+        <label class="input__container">
+          <input
+            class="${inputClass}"
+            type="${this.props.type || "text"}"
+            placeholder="${this.props.placeholder || ""}"
+            name="${this.props.name || ""}"
+            value="${this.props.value || ""}"
+            ${this.props.required ? "required" : ""}
+          />
+          ${this.props.placeholder ? `<div class="input__label">${this.props.placeholder}</div>` : ""}
+        </label> 
+        ${this.props.error ? `<div class="input__error">${this.props.error}</div>` : ""}
+      </div>
+    `;
   }
 }
 

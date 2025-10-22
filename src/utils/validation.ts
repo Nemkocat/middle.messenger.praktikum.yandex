@@ -14,6 +14,9 @@ export interface ValidationResult {
         phone: this.validatePhone,
         message: this.validateMessage,
         password_repeat: this.validatePasswordRepeat,
+        oldPassword: this.validateOldPassword,
+        newPassword: this.validateNewPassword,
+        confirmPassword: this.validateConfirmPassword,
       };
   
       const validator = validators[fieldName];
@@ -134,6 +137,48 @@ export interface ValidationResult {
       }
       
       if (allData?.password && value !== allData.password) {
+        return { isValid: false, errorMessage: 'Пароли не совпадают' };
+      }
+      
+      return { isValid: true, errorMessage: '' };
+    }
+
+    private static validateOldPassword(value: string): ValidationResult {
+      if (!value.trim()) {
+        return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
+      }
+      
+      return { isValid: true, errorMessage: '' };
+    }
+
+    private static validateNewPassword(value: string): ValidationResult {
+      if (!value.trim()) {
+        return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
+      }
+      
+      if (value.length < 8 || value.length > 40) {
+        return { isValid: false, errorMessage: 'Длина должна быть от 8 до 40 символов' };
+      }
+      
+      const hasUpperCase = /[A-Z]/.test(value);
+      const hasDigit = /\d/.test(value);
+      
+      if (!hasUpperCase || !hasDigit) {
+        return { 
+          isValid: false, 
+          errorMessage: 'Пароль должен содержать хотя бы одну заглавную букву и цифру' 
+        };
+      }
+      
+      return { isValid: true, errorMessage: '' };
+    }
+
+    private static validateConfirmPassword(value: string, allData?: Record<string, string>): ValidationResult {
+      if (!value.trim()) {
+        return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
+      }
+      
+      if (allData?.newPassword && value !== allData.newPassword) {
         return { isValid: false, errorMessage: 'Пароли не совпадают' };
       }
       

@@ -2,6 +2,7 @@ import Block from "../../core/block";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import Link from "../../components/Link";
+import { Validator } from "../../utils/validation";
 import registerTemplate from "./register.hbs?raw";
 
 interface RegisterPageProps {
@@ -13,6 +14,24 @@ export default class RegisterPage extends Block {
   constructor(props: RegisterPageProps) {
     super("div", {
       ...props,
+      formState: {
+        email: "",
+        login: "",
+        first_name: "",
+        second_name: "",
+        phone: "",
+        password: "",
+        password_repeat: "",
+      },
+      errors: {
+        email: "",
+        login: "",
+        first_name: "",
+        second_name: "",
+        phone: "",
+        password: "",
+        password_repeat: "",
+      },
       className: "container",
       EmailInput: new Input({
         id: "register-email",
@@ -20,6 +39,10 @@ export default class RegisterPage extends Block {
         type: "email",
         placeholder: "Почта",
         name: "email",
+        value: "",
+        error: "",
+        onChange: (e: Event) => this.handleFieldChange("email", e),
+        onBlur: (e: Event) => this.handleFieldBlur("email", e),
       }),
       UsernameInput: new Input({
         id: "register-username",
@@ -27,6 +50,10 @@ export default class RegisterPage extends Block {
         type: "text",
         placeholder: "Логин",
         name: "login",
+        value: "",
+        error: "",
+        onChange: (e: Event) => this.handleFieldChange("login", e),
+        onBlur: (e: Event) => this.handleFieldBlur("login", e),
       }),
       NameInput: new Input({
         id: "register-name",
@@ -34,6 +61,10 @@ export default class RegisterPage extends Block {
         type: "text",
         placeholder: "Имя",
         name: "first_name",
+        value: "",
+        error: "",
+        onChange: (e: Event) => this.handleFieldChange("first_name", e),
+        onBlur: (e: Event) => this.handleFieldBlur("first_name", e),
       }),
       SurnameInput: new Input({
         id: "register-surname",
@@ -41,7 +72,10 @@ export default class RegisterPage extends Block {
         type: "text",
         placeholder: "Фамилия",
         name: "second_name",
-
+        value: "",
+        error: "",
+        onChange: (e: Event) => this.handleFieldChange("second_name", e),
+        onBlur: (e: Event) => this.handleFieldBlur("second_name", e),
       }),
       PhoneInput: new Input({
         id: "register-tel",
@@ -49,6 +83,10 @@ export default class RegisterPage extends Block {
         type: "tel",
         placeholder: "Телефон",
         name: "phone",
+        value: "",
+        error: "",
+        onChange: (e: Event) => this.handleFieldChange("phone", e),
+        onBlur: (e: Event) => this.handleFieldBlur("phone", e),
       }),
       PasswordInput: new Input({
         id: "login-password",
@@ -56,6 +94,10 @@ export default class RegisterPage extends Block {
         type: "password",
         placeholder: "Пароль",
         name: "password",
+        value: "",
+        error: "",
+        onChange: (e: Event) => this.handleFieldChange("password", e),
+        onBlur: (e: Event) => this.handleFieldBlur("password", e),
       }),
       PasswordRepeatInput: new Input({
         id: "login-password-repeat",
@@ -63,12 +105,16 @@ export default class RegisterPage extends Block {
         type: "password",
         placeholder: "Пароль (ещё раз)",
         name: "password_repeat",
+        value: "",
+        error: "",
+        onChange: (e: Event) => this.handleFieldChange("password_repeat", e),
+        onBlur: (e: Event) => this.handleFieldBlur("password_repeat", e),
       }),
       SubmitButton: new Button({
         id: "submit-btn",
         class: "auth-form__btn register-btn",
         text: "Зарегистрироваться",
-        onClick: props.onSubmit,
+        onClick: (e: Event) => this.handleSubmit(e),
       }),
       LoginLink: new Link({
         href: "#",
@@ -82,20 +128,93 @@ export default class RegisterPage extends Block {
     });
   }
 
-  // Реализация отправки формы в консоль
+  handleFieldChange(fieldName: string, e: Event) {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    const validation = Validator.validate(fieldName, value, this.props.formState);
+    
+    // Обновляем соответствующий Input компонент
+    const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
+    if (inputComponent && !Array.isArray(inputComponent)) {
+      inputComponent.setProps({
+        value,
+        error: validation.isValid ? "" : validation.errorMessage,
+      });
+    }
+
+    this.setProps({
+      formState: {
+        ...this.props.formState,
+        [fieldName]: value
+      },
+      errors: {
+        ...this.props.errors,
+        [fieldName]: validation.isValid ? "" : validation.errorMessage,
+      }
+    });
+  }
+
+  handleFieldBlur(fieldName: string, e: Event) {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    const validation = Validator.validate(fieldName, value, this.props.formState);
+    
+    // Обновляем соответствующий Input компонент
+    const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
+    if (inputComponent && !Array.isArray(inputComponent)) {
+      inputComponent.setProps({
+        error: validation.isValid ? "" : validation.errorMessage,
+      });
+    }
+
+    this.setProps({
+      errors: {
+        ...this.props.errors,
+        [fieldName]: validation.isValid ? "" : validation.errorMessage,
+      }
+    });
+  }
 
   handleSubmit(e: Event) {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const formData: Record<string, string> = {};
+    
+    // Валидация всех полей при submit
+    const fields = ['email', 'login', 'first_name', 'second_name', 'phone', 'password', 'password_repeat'];
+    let hasErrors = false;
+    const newErrors: Record<string, string> = {};
 
-    for (const element of form.elements) {
-      if (element instanceof HTMLInputElement && element.name) {
-        formData[element.name] = element.value;
+    fields.forEach(fieldName => {
+      const value = this.props.formState[fieldName];
+      const validation = Validator.validate(fieldName, value, this.props.formState);
+      
+      if (!validation.isValid) {
+        hasErrors = true;
+        newErrors[fieldName] = validation.errorMessage;
+        
+        // Обновляем соответствующий Input компонент
+        const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
+        if (inputComponent && !Array.isArray(inputComponent)) {
+          inputComponent.setProps({
+            error: validation.errorMessage,
+          });
+        }
+      } else {
+        newErrors[fieldName] = "";
       }
+    });
+
+    this.setProps({
+      errors: newErrors
+    });
+
+    // Если есть ошибки, не отправляем форму
+    if (hasErrors) {
+      console.log("Form has validation errors");
+      return;
     }
 
-    console.log("Form Data:", formData);
+    // Если валидация прошла успешно
+    console.log("Form Data:", this.props.formState);
   }
 
   render(): string {

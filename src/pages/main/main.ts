@@ -1,6 +1,6 @@
 import Block from "../../core/block";
-import ChatList from "../../components/ChatList";
 import ChatArea from "../../components/ChatArea";
+import ChatList from "../../components/ChatList";
 import Link from "../../components/Link";
 import Input from "../../components/Input";
 import mainTemplate from "./main.hbs?raw";
@@ -24,6 +24,7 @@ export default class MainPage extends Block {
       // данные для хелперов в шаблоне
       chats: mockChats,
       mockChats: mockChats,
+      selectedChat: null, // Спроси почему null
       ProfileLink: new Link({
         href: "#",
         class: "chats-menu-nav__profile-link",
@@ -41,11 +42,68 @@ export default class MainPage extends Block {
         name: "search",
         onChange: props.onSearchChange,
       }),
+      ChatListComponent: new ChatList({
+        chats: mockChats,
+        onChatClick: (chat) => {
+          this.setProps({ selectedChat: chat });
+        },
+      }),
+      ChatAreaComponent: new ChatArea({
+        isEmpty: true,
+        onSubmit: props.onMessageSubmit,
+        onFileChange: props.onFileChange,
+        onMessageChange: props.onMessageChange,
+      }),
     });
 
     // Регистрируем компоненты-хелперы, используемые в шаблоне
     registerComponent(ChatList);
     registerComponent(ChatArea);
+  }
+
+  componentDidUpdate(oldProps: any, newProps: any): boolean {
+    if (oldProps.selectedChat !== newProps.selectedChat) {
+      const { ChatAreaComponent } = this.children;
+      if (ChatAreaComponent && !Array.isArray(ChatAreaComponent)) {
+        if (newProps.selectedChat) {
+          ChatAreaComponent.setProps({
+            isEmpty: false,
+            chat: {
+              avatar: newProps.selectedChat.avatar,
+              title: newProps.selectedChat.title,
+            messages: [
+              {
+                content: "Короче анекдот:",
+                time: "11:56",
+                isMine: false,
+              },
+              {
+                content: "Мама собирает сыну обед в школу. - Вот, положила тебе в ранец хлеб, колбасу и гвозди. - Мам, а нафига?. - Ну как же, берешь хлеб, кладешь на него колбасу и ешь. - А гвозди? - Так вот же они!",
+                time: "11:56",
+                isMine: false,
+              },
+              {
+                content: "Жесть!",
+                time: "12:00",
+                isMine: true,
+              }
+            ]
+            },
+            onSubmit: newProps.onMessageSubmit,
+            onFileChange: newProps.onFileChange,
+            onMessageChange: newProps.onMessageChange,
+          });
+        } else {
+          ChatAreaComponent.setProps({ 
+            isEmpty: true,
+            onSubmit: newProps.onMessageSubmit,
+            onFileChange: newProps.onFileChange,
+            onMessageChange: newProps.onMessageChange,
+          });
+        }
+      }
+    }
+    return true;
   }
 
   render(): string {

@@ -124,7 +124,7 @@ export default class Block {
     this.componentDidMount();
   }
 
-  componentDidMount(oldProps?: PropsBlock) {}
+  componentDidMount(_oldProps?: PropsBlock) {}
 
   dispatchComponentDidMount() {
     this.eventBus().emit(Block.EVENTS.FLOW_CDM);
@@ -138,7 +138,7 @@ export default class Block {
     this._render();
   }
 
-  componentDidUpdate(oldProps: PropsBlock, newProps: PropsBlock): boolean {
+  componentDidUpdate(_oldProps: PropsBlock, _newProps: PropsBlock): boolean {
     return true;
   }
 
