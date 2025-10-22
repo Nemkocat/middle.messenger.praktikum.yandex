@@ -5,6 +5,7 @@ import Link from "../../components/Link";
 import Input from "../../components/Input";
 import mainTemplate from "./main.hbs?raw";
 import mockChats from "./mockChats";
+import registerComponent from "../../core/registerComponent";
 
 interface MainPageProps {
   chats?: any[];
@@ -18,11 +19,11 @@ interface MainPageProps {
 
 export default class MainPage extends Block {
   constructor(props: MainPageProps) {
-    console.log('MainPage constructor called with props:', props);
-    console.log('mockChats:', mockChats);
-    
     super("div", {
       ...props,
+      // данные для хелперов в шаблоне
+      chats: mockChats,
+      mockChats: mockChats,
       ProfileLink: new Link({
         href: "#",
         class: "chats-menu-nav__profile-link",
@@ -40,18 +41,11 @@ export default class MainPage extends Block {
         name: "search",
         onChange: props.onSearchChange,
       }),
-      ChatList: new ChatList({
-        chats: mockChats, 
-        onChatClick: props.onChatClick,
-      }),
-      ChatArea: new ChatArea({
-        isEmpty: !props.selectedChat,
-        chat: props.selectedChat,
-        onSubmit: props.onMessageSubmit,
-        onFileChange: props.onFileChange,
-        onMessageChange: props.onMessageChange,
-      }),
     });
+
+    // Регистрируем компоненты-хелперы, используемые в шаблоне
+    registerComponent(ChatList);
+    registerComponent(ChatArea);
   }
 
   render(): string {
