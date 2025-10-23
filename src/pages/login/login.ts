@@ -26,7 +26,7 @@ export default class LoginPage extends Block {
       className: "container",
       LoginInput: new Input({
         id: "login-username",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "text",
         placeholder: "Логин",
         name: "login",
@@ -78,7 +78,7 @@ export default class LoginPage extends Block {
       }),
       PasswordInput: new Input({
         id: "login-password",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "password",
         placeholder: "Пароль",
         name: "password",

@@ -35,7 +35,7 @@ export default class RegisterPage extends Block {
       className: "container",
       EmailInput: new Input({
         id: "register-email",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "email",
         placeholder: "Почта",
         name: "email",
@@ -46,7 +46,7 @@ export default class RegisterPage extends Block {
       }),
       UsernameInput: new Input({
         id: "register-username",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "text",
         placeholder: "Логин",
         name: "login",
@@ -57,7 +57,7 @@ export default class RegisterPage extends Block {
       }),
       NameInput: new Input({
         id: "register-name",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "text",
         placeholder: "Имя",
         name: "first_name",
@@ -68,7 +68,7 @@ export default class RegisterPage extends Block {
       }),
       SurnameInput: new Input({
         id: "register-surname",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "text",
         placeholder: "Фамилия",
         name: "second_name",
@@ -79,7 +79,7 @@ export default class RegisterPage extends Block {
       }),
       PhoneInput: new Input({
         id: "register-tel",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "tel",
         placeholder: "Телефон",
         name: "phone",
@@ -90,7 +90,7 @@ export default class RegisterPage extends Block {
       }),
       PasswordInput: new Input({
         id: "login-password",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "password",
         placeholder: "Пароль",
         name: "password",
@@ -101,7 +101,7 @@ export default class RegisterPage extends Block {
       }),
       PasswordRepeatInput: new Input({
         id: "login-password-repeat",
-        class: "auth-form__input",
+        class: "auth-form__input-wrapper",
         type: "password",
         placeholder: "Пароль (ещё раз)",
         name: "password_repeat",

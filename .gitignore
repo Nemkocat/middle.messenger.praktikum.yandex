@@ -25,5 +25,6 @@ dist-ssr
 
 # Helper files for me
 
-.cursor
 .dev-example
+dev-example/
+.dev-example/

@@ -17,9 +17,9 @@ export default class Input extends Block {
   constructor(props: InputProps) {
     super("div", {
       ...props,
-      className: "input",
+      className: "input-component",
       attrs: {
-        class: props.class || "input",
+        class: props.class || "input-component",
       },
       events: {
         change: props.onChange,
@@ -29,12 +29,12 @@ export default class Input extends Block {
   }
 
   render(): string {
-    const errorClass = this.props.error ? "input--error" : "";
-    const inputClass = `input__element ${errorClass}`.trim();
+    const errorClass = this.props.error ? "input-component--error" : "";
+    const inputClass = `input-component__element ${errorClass}`.trim();
     
     return `
-      <div class="input ${errorClass}">
-        <label class="input__container">
+      <div class="input-component ${errorClass}">
+        <label class="input-component__container">
           <input
             class="${inputClass}"
             type="${this.props.type || "text"}"
@@ -43,9 +43,8 @@ export default class Input extends Block {
             value="${this.props.value || ""}"
             ${this.props.required ? "required" : ""}
           />
-          ${this.props.placeholder ? `<div class="input__label">${this.props.placeholder}</div>` : ""}
         </label> 
-        ${this.props.error ? `<div class="input__error">${this.props.error}</div>` : ""}
+        ${this.props.error ? `<div class="input-component__error">${this.props.error}</div>` : ""}
       </div>
     `;
   }

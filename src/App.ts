@@ -40,7 +40,7 @@ export default class App {
     constructor() {
         // Инициализация состояния приложения
         this.state = {
-            currentPage: 'main', 
+            currentPage: 'cheatPage', 
             // Текущая активная страница, весь список доступных страниц внутри PageKey 
         };
         

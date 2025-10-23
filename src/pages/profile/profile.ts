@@ -9,7 +9,7 @@ export default class ProfilePage extends Block {
     super("div", {
       ...props,
       AvatarComponent: new Avatar({
-        class: "profile__avatar",
+        class: "profile-data__avatar",
         name: "avatar",
         img: "/images/default-avatar.png",
         imgClass: "profile__avatar_img",

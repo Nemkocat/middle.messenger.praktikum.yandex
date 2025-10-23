@@ -26,7 +26,7 @@ export default class EditProfilePage extends Block {
         nickname: "",
         phone: "",
       },
-      Avatar: new Avatar({
+      AvatarComponent: new Avatar({
         class: "profile__avatar",
         name: "avatar",
         img: "/images/default-avatar.png",
