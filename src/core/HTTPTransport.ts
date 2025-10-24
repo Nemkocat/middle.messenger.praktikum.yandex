@@ -1,10 +1,10 @@
 export interface HTTPTransportOptions {
   timeout?: number;
   headers?: Record<string, string>;
-  data?: any;
+  data?: unknown;
 }
 
-export interface HTTPTransportResponse<T = any> {
+export interface HTTPTransportResponse<T = unknown> {
   status: number;
   statusText: string;
   data: T;
@@ -17,11 +17,11 @@ export default class HTTPTransport {
     this.baseURL = baseURL;
   }
 
-  private createRequest(
+  private createRequest<T = unknown>(
     method: string,
     url: string,
     options: HTTPTransportOptions = {}
-  ): Promise<HTTPTransportResponse> {
+  ): Promise<HTTPTransportResponse<T>> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       const fullUrl = this.baseURL + url;
@@ -33,8 +33,8 @@ export default class HTTPTransport {
 
       // Обработка query string для GET запросов
       let requestUrl = fullUrl;
-      if (method === 'GET' && options.data) {
-        const queryString = this.buildQueryString(options.data);
+      if (method === 'GET' && options.data && typeof options.data === 'object' && options.data !== null) {
+        const queryString = this.buildQueryString(options.data as Record<string, unknown>);
         requestUrl += (fullUrl.includes('?') ? '&' : '?') + queryString;
       }
 
@@ -49,7 +49,7 @@ export default class HTTPTransport {
 
       // Обработка событий
       xhr.onload = () => {
-        let responseData: any;
+        let responseData: unknown;
         try {
           responseData = JSON.parse(xhr.responseText);
         } catch {
@@ -59,7 +59,7 @@ export default class HTTPTransport {
         resolve({
           status: xhr.status,
           statusText: xhr.statusText,
-          data: responseData,
+          data: responseData as T,
         });
       };
 
@@ -75,8 +75,10 @@ export default class HTTPTransport {
       if (method !== 'GET' && options.data) {
         if (options.headers?.['Content-Type'] === 'application/json') {
           xhr.send(JSON.stringify(options.data));
+        } else if (typeof options.data === 'string' || options.data instanceof FormData || options.data instanceof Blob) {
+          xhr.send(options.data as XMLHttpRequestBodyInit);
         } else {
-          xhr.send(options.data);
+          xhr.send(JSON.stringify(options.data));
         }
       } else {
         xhr.send();
@@ -84,7 +86,7 @@ export default class HTTPTransport {
     });
   }
 
-  private buildQueryString(data: Record<string, any>): string {
+  private buildQueryString(data: Record<string, unknown>): string {
     const params = new URLSearchParams();
     
     Object.entries(data).forEach(([key, value]) => {
@@ -96,12 +98,12 @@ export default class HTTPTransport {
     return params.toString();
   }
 
-  get<T = any>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest('GET', url, options);
+  get<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
+    return this.createRequest<T>('GET', url, options);
   }
 
-  post<T = any>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest('POST', url, {
+  post<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
+    return this.createRequest<T>('POST', url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -110,8 +112,8 @@ export default class HTTPTransport {
     });
   }
 
-  put<T = any>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest('PUT', url, {
+  put<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
+    return this.createRequest<T>('PUT', url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -120,7 +122,7 @@ export default class HTTPTransport {
     });
   }
 
-  delete<T = any>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest('DELETE', url, options);
+  delete<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
+    return this.createRequest<T>('DELETE', url, options);
   }
 }

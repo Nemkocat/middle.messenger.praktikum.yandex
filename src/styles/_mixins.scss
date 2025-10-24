@@ -61,6 +61,7 @@
   width: $width;
   padding: $padding;
   border: none;
+  border-radius: 0;
   border-bottom: 1px solid $border-bottom-color;
   font-size: $font-size;
   background: transparent;
@@ -70,6 +71,7 @@
   &::placeholder {
     font-weight: 500;
     color: $placeholder-color;
+    text-align: left;
   }
 }
 

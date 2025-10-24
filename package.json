@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "vite build && vite preview",
+    "start": "npm run lint && npm run lint:styles && vite build && vite preview",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "lint:styles": "stylelint src/**/*.{css,scss}",

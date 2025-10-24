@@ -34,7 +34,13 @@
       // Ошибка, если объявлен параметр функции, но не используется
       "noUnusedParameters": true,
       // Ошибка, если в switch есть неявное "проваливание" в следующий case без break/return
-      "noFallthroughCasesInSwitch": true
+      "noFallthroughCasesInSwitch": true,
+      // Ошибка при использовании any типа
+      "noImplicitAny": true,
+      // Строгая проверка null и undefined
+      "strictNullChecks": true,
+      // Генерация source maps для отладки
+      "sourceMap": true
     },
     // Какие файлы включать в проверку типов (здесь — вся папка src)
     "include": ["src"]

@@ -6,17 +6,26 @@ export interface ValidationResult {
   export class Validator {
     static validate(fieldName: string, value: string, allData?: Record<string, string>): ValidationResult {
       const validators: Record<string, (value: string, allData?: Record<string, string>) => ValidationResult> = {
-        first_name: this.validateName,
-        second_name: this.validateName,
-        login: this.validateLogin,
-        email: this.validateEmail,
-        password: this.validatePassword,
-        phone: this.validatePhone,
-        message: this.validateMessage,
-        password_repeat: this.validatePasswordRepeat,
-        oldPassword: this.validateOldPassword,
-        newPassword: this.validateNewPassword,
-        confirmPassword: this.validateConfirmPassword,
+        // Регистрация (RegisterPage) и редактирование профиля (EditProfilePage)
+        first_name: this.validateName,        // Имя - регистрация, редактирование профиля
+        second_name: this.validateName,       // Фамилия - регистрация, редактирование профиля
+        login: this.validateLogin,           // Логин - авторизация, регистрация, редактирование профиля
+        email: this.validateEmail,           // Email - регистрация, редактирование профиля
+        phone: this.validatePhone,           // Телефон - регистрация, редактирование профиля
+        
+        // Авторизация (LoginPage) и регистрация (RegisterPage)
+        password: this.validatePassword,     // Пароль - авторизация, регистрация
+        
+        // Регистрация (RegisterPage)
+        password_repeat: this.validatePasswordRepeat,  // Повтор пароля - регистрация
+        
+        // Смена пароля (EditPasswordPage)
+        oldPassword: this.validateOldPassword,        // Старый пароль - смена пароля
+        newPassword: this.validateNewPassword,        // Новый пароль - смена пароля
+        confirmPassword: this.validateConfirmPassword, // Подтверждение пароля - смена пароля
+        
+        // Отправка сообщений (ChatArea)
+        message: this.validateMessage,        // Сообщение - чат
       };
   
       const validator = validators[fieldName];
@@ -27,6 +36,9 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
   
+    // Валидация имени и фамилии
+    // Используется в: RegisterPage (регистрация), EditProfilePage (редактирование профиля)
+    // Правила: латиница или кириллица, первая буква заглавная, без пробелов и цифр, только дефис
     private static validateName(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
@@ -43,6 +55,9 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
   
+    // Валидация логина
+    // Используется в: LoginPage (авторизация), RegisterPage (регистрация), EditProfilePage (редактирование профиля)
+    // Правила: от 3 до 20 символов, латиница, может содержать цифры, но не состоять из них, без пробелов, только дефис и подчёркивание
     private static validateLogin(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
@@ -69,12 +84,15 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
   
+    // Валидация email
+    // Используется в: RegisterPage (регистрация), EditProfilePage (редактирование профиля)
+    // Правила: латиница, может включать цифры и спецсимволы, обязательно @ и точка после неё, перед точкой должны быть буквы
     private static validateEmail(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
       }
       
-      const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z]+\.[a-zA-Z]+$/;
+      const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!regex.test(value)) {
         return { 
           isValid: false, 
@@ -85,6 +103,9 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
   
+    // Валидация пароля
+    // Используется в: LoginPage (авторизация), RegisterPage (регистрация)
+    // Правила: от 8 до 40 символов, обязательно хотя бы одна заглавная буква и цифра
     private static validatePassword(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
@@ -107,6 +128,9 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
   
+    // Валидация телефона
+    // Используется в: RegisterPage (регистрация), EditProfilePage (редактирование профиля)
+    // Правила: от 10 до 15 символов, состоит из цифр, может начинаться с плюса
     private static validatePhone(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
@@ -123,6 +147,9 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
   
+    // Валидация сообщения
+    // Используется в: ChatArea (отправка сообщений в чате)
+    // Правила: не должно быть пустым
     private static validateMessage(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Сообщение не должно быть пустым' };
@@ -131,18 +158,27 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
   
+    // Валидация повторного ввода пароля
+    // Используется в: RegisterPage (регистрация) - поле "password_repeat"
+    // Правила: не должно быть пустым, должно совпадать с основным паролем
     private static validatePasswordRepeat(value: string, allData?: Record<string, string>): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
       }
       
-      if (allData?.password && value !== allData.password) {
-        return { isValid: false, errorMessage: 'Пароли не совпадают' };
+      // Проверяем соответствие паролей только если основной пароль тоже заполнен
+      if (allData?.password && allData.password.trim()) {
+        if (value !== allData.password) {
+          return { isValid: false, errorMessage: 'Пароли не совпадают' };
+        }
       }
       
       return { isValid: true, errorMessage: '' };
     }
 
+    // Валидация старого пароля
+    // Используется в: EditPasswordPage (смена пароля) - поле "oldPassword"
+    // Правила: не должно быть пустым
     private static validateOldPassword(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
@@ -151,6 +187,9 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
 
+    // Валидация нового пароля
+    // Используется в: EditPasswordPage (смена пароля) - поле "newPassword"
+    // Правила: от 8 до 40 символов, обязательно хотя бы одна заглавная буква и цифра
     private static validateNewPassword(value: string): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
@@ -173,13 +212,19 @@ export interface ValidationResult {
       return { isValid: true, errorMessage: '' };
     }
 
+    // Валидация подтверждения пароля
+    // Используется в: EditPasswordPage (смена пароля) - поле "confirmPassword"
+    // Правила: не должно быть пустым, должно совпадать с новым паролем
     private static validateConfirmPassword(value: string, allData?: Record<string, string>): ValidationResult {
       if (!value.trim()) {
         return { isValid: false, errorMessage: 'Поле не должно быть пустым' };
       }
       
-      if (allData?.newPassword && value !== allData.newPassword) {
-        return { isValid: false, errorMessage: 'Пароли не совпадают' };
+      // Проверяем соответствие паролей только если новый пароль тоже заполнен
+      if (allData?.newPassword && allData.newPassword.trim()) {
+        if (value !== allData.newPassword) {
+          return { isValid: false, errorMessage: 'Пароли не совпадают' };
+        }
       }
       
       return { isValid: true, errorMessage: '' };

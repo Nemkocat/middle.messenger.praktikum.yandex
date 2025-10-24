@@ -1,14 +1,14 @@
 import renderDOM from './core/renderDom';
-import LoginPage from './pages/login/login.ts';
-import RegisterPage from './pages/register/register.ts';
-import Error404Page from './pages/404/404.ts';
-import Error500Page from './pages/500/505.ts';
-import MainPage from './pages/main/main.ts';
-import ProfilePage from './pages/profile/profile.ts';
-import EditPasswordPage from './pages/editPassword/editPassword.ts';
-import EditProfilePage from './pages/editProfile/editProfile.ts';
-import CheatPage from './pages/allpages/cheatPage.ts';
-import mockChats from './pages/main/mockChats';
+import LoginPage from './views/pages/login/login.ts';
+import RegisterPage from './views/pages/register/register.ts';
+import Error404Page from './views/pages/404/404.ts';
+import Error500Page from './views/pages/500/505.ts';
+import MainPage from './views/pages/main/main.ts';
+import ProfilePage from './views/pages/profile/profile.ts';
+import EditPasswordPage from './views/pages/editPassword/editPassword.ts';
+import EditProfilePage from './views/pages/editProfile/editProfile.ts';
+import CheatPage from './views/pages/allpages/cheatPage.ts';
+import { ChatController } from './controllers/ChatController';
 
 // Типы для TypeScript
 import Block from './core/block';
@@ -36,6 +36,7 @@ export default class App {
     private state: AppState;
     private appElement: HTMLElement | null;
     private currentPageInstance: Block | null = null;
+    private chatController: ChatController;
 
     constructor() {
         // Инициализация состояния приложения
@@ -49,7 +50,10 @@ export default class App {
 
         if (this.appElement === null) {
             throw new Error('App не найден, перезагрузите страницу');
-        } 
+        }
+
+        // Инициализация Controller'ов
+        this.chatController = new ChatController();
     
         // Запуск инициализации приложения
         this.init();
@@ -91,7 +95,8 @@ export default class App {
     }
 
     // Получение класса страницы по ключу
-    private getPageClass(page: PageKey): new (props?: any) => Block {
+    private getPageClass(page: PageKey): new (props?: any) => Block { // eslint-disable-line @typescript-eslint/no-explicit-any
+        // Используем any здесь, так как разные страницы имеют разные типы props
         switch (page) {
             case 'login':
                 return LoginPage;
@@ -121,9 +126,17 @@ export default class App {
         // Создаем экземпляр страницы
         const PageClass = this.getPageClass(this.state.currentPage);
         
-        // Передаем данные чатов для MainPage
-        const pageProps = this.state.currentPage === 'main' ? { chats: mockChats } : {};
+        // Передаем данные и Controller для MainPage
+        const pageProps = this.state.currentPage === 'main' ? { 
+            chatController: this.chatController 
+        } : {};
+        
         this.currentPageInstance = new PageClass(pageProps);
+        
+        // Устанавливаем ссылку на View в Controller
+        if (this.state.currentPage === 'main') {
+            this.chatController.setView(this.currentPageInstance);
+        }
         
         // Монтируем страницу в DOM
         renderDOM(this.currentPageInstance);

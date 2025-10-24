@@ -3,7 +3,9 @@ import Handlebars from "handlebars";
 
 // Типы для Block
 interface PropsBlock {
-  [key: string]: any;
+  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // Используем any здесь, так как props могут содержать любые типы данных
+  // (строки, числа, функции, объекты, компоненты и т.д.)
 }
 
 interface ChildrenBlock {
@@ -27,7 +29,7 @@ export default class Block {
   _id: string | null = null; // Уникальный ID компонента
   children: ChildrenBlock = {}; // Дочерние компоненты
   props: PropsBlock = {}; // Свойства компонента
-  eventBus: () => EventBus<any>; // EventBus для компонента
+  eventBus: () => EventBus<string>; // EventBus для компонента - используем string вместо any
 
 
   // constructor - специальный метод класса, который вызывается при создании экземпляра через new (new Block())
@@ -63,10 +65,12 @@ export default class Block {
     eventBus.emit(Block.EVENTS.INIT);
   }
 
-  _registerEvents(eventBus: EventBus<any>) {
+  _registerEvents(eventBus: EventBus<string>) {
     eventBus.on(Block.EVENTS.INIT, this.init.bind(this));
     eventBus.on(Block.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
+    eventBus.on(Block.EVENTS.FLOW_CDU, (...args: unknown[]) => {
+      this._componentDidUpdate(args[0] as PropsBlock, args[1] as PropsBlock);
+    });
     eventBus.on(Block.EVENTS.FLOW_RENDER, this._render.bind(this));
   }
 
@@ -242,12 +246,14 @@ export default class Block {
     const eventBus = this.eventBus();
     const emitBind = eventBus.emit.bind(eventBus);
 
-    return new Proxy(props as any, {
+    return new Proxy(props as Record<string, unknown>, {
       get(target, prop) {
+        if (typeof prop === 'symbol') return undefined;
         const value = target[prop];
         return typeof value === "function" ? value.bind(target) : value;
       },
       set(target, prop, value) {
+        if (typeof prop === 'symbol') return false;
         const oldTarget = { ...target };
         target[prop] = value;
 
