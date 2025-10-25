@@ -12,3 +12,4 @@ export interface Chat {
   time: string;
   unreadCount?: number;
 }
+

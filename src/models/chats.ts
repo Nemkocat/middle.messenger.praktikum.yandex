@@ -44,3 +44,4 @@ export function searchChats(query: string): Chat[] {
     chat.lastMessage.toLowerCase().includes(query.toLowerCase())
   );
 }
+

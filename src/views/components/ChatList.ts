@@ -57,3 +57,4 @@ export default class ChatList extends Block {
     `;
   }
 }
+

@@ -22,3 +22,4 @@ export default class Error404Page extends Block {
 }
 
 export { Error404Page };
+
