@@ -45,3 +45,4 @@ export default class Avatar extends Block {
     `;
   }
 }
+

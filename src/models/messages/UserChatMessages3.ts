@@ -27,3 +27,4 @@ export const UserChatMessages3: Message[] = [
     isMine: false,
   }
 ];
+

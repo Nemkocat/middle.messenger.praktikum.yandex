@@ -196,3 +196,4 @@ export default class ChatArea extends Block {
     `;
   }
 }
+

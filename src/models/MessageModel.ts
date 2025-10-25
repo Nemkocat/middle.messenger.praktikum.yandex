@@ -13,3 +13,4 @@ export class MessageModel {
     return messages.length > 0 ? messages[messages.length - 1] : null;
   }
 }
+
