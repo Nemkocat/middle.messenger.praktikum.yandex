@@ -13,3 +13,4 @@ export default function renderDOM(block: Block): void {
     root.appendChild(content);
   }
 }
+

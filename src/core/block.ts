@@ -128,7 +128,7 @@ export default class Block {
     this.componentDidMount();
   }
 
-  componentDidMount(_oldProps?: PropsBlock) {}
+  componentDidMount(_oldProps?: PropsBlock) {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
   dispatchComponentDidMount() {
     this.eventBus().emit(Block.EVENTS.FLOW_CDM);
@@ -142,7 +142,7 @@ export default class Block {
     this._render();
   }
 
-  componentDidUpdate(_oldProps: PropsBlock, _newProps: PropsBlock): boolean {
+  componentDidUpdate(_oldProps: PropsBlock, _newProps: PropsBlock): boolean { // eslint-disable-line @typescript-eslint/no-unused-vars
     return true;
   }
 
@@ -281,3 +281,4 @@ export default class Block {
     this.getContent()!.style.display = "none";
   }
 }
+
