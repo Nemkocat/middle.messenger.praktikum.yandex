@@ -1,48 +1,24 @@
 {
-    // Раздел глобальных настроек компилятора TypeScript
-    "compilerOptions": {
-      // Версия генерируемого JS-кода и доступных встроенных возможностей
-      "target": "ES2020",
-      // Использовать семантику define-полей классов (соответствует современному стандарту)
-      "useDefineForClassFields": true,
-      // Формат модулей на выходе (ESNext — для современных бандлеров, как Vite)
-      "module": "ESNext",
-      // Наборы API, которые доступны в типах (ES2020 и браузерные DOM API)
-      "lib": ["ES2020", "DOM", "DOM.Iterable"],
-      // Пропускать проверку типов внутри файлов d.ts сторонних библиотек (ускоряет сборку)
-      "skipLibCheck": true,
-      // Базовый каталог для разрешения относительных импортов без путей вида ../../
-      "baseUrl": "./src",
-  
-      /* Режим для работы с бандлером (Vite) */
-      // Алгоритм поиска модулей: "bundler" учитывает стратегии современных бандлеров
-      "moduleResolution": "bundler",
-      // Разрешать импорты с явными .ts/.tsx расширениями (обычно не требуется, но можно)
-      "allowImportingTsExtensions": true,
-      // Разрешать импорт JSON как модулей (например, import data from './data.json')
-      "resolveJsonModule": true,
-      // Требовать, чтобы каждый файл компилировался изолированно (важно для бандлеров)
-      "isolatedModules": true,
-      // Не эмитить файлы при запуске tsc (только проверка типов; сборку делает Vite)
-      "noEmit": true,
-  
-      /* Строгая проверка и базовые линтинговые правила */
-      // Включает набор строгих проверок типов (лучше ловит ошибки)
-      "strict": true,
-      // Ошибка, если объявлена локальная переменная, но не используется
-      "noUnusedLocals": true,
-      // Ошибка, если объявлен параметр функции, но не используется
-      "noUnusedParameters": true,
-      // Ошибка, если в switch есть неявное "проваливание" в следующий case без break/return
-      "noFallthroughCasesInSwitch": true,
-      // Ошибка при использовании any типа
-      "noImplicitAny": true,
-      // Строгая проверка null и undefined
-      "strictNullChecks": true,
-      // Генерация source maps для отладки
-      "sourceMap": true
-    },
-    // Какие файлы включать в проверку типов (здесь — вся папка src)
-    "include": ["src"]
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "baseUrl": "./src",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "sourceMap": true
+  },
+  "include": ["src"]
 }
 
