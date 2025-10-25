@@ -43,7 +43,7 @@ export default [
     },
   },
   {
-    ignores: ['dist/', 'node_modules/', '*.js'],
+    ignores: ['dist/', 'node_modules/', '*.js', 'vite.config.ts'],
   },
 ];
 
