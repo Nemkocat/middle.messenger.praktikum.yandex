@@ -15,7 +15,7 @@ export default class EditProfilePage extends Block {
         login: "ivanivanov",
         first_name: "Иван",
         second_name: "Иванов",
-        nickname: "Иван",
+        display_name: "Иван",
         phone: "+7 (909) 123 45 67",
       },
       errors: {
@@ -23,7 +23,7 @@ export default class EditProfilePage extends Block {
         login: "",
         first_name: "",
         second_name: "",
-        nickname: "",
+        display_name: "",
         phone: "",
       },
       AvatarComponent: new Avatar({
@@ -88,15 +88,15 @@ export default class EditProfilePage extends Block {
         onChange: (e: Event) => this.handleFieldChange("second_name", e),
         onBlur: (e: Event) => this.handleFieldBlur("second_name", e),
       }),
-      NicknameItem: new ProfileDataItem({
+      DisplayNameItem: new ProfileDataItem({
         title: "Имя в чате",
         value: "Иван",
-        name: "nickname",
+        name: "display_name",
         type: "text",
         editable: true,
         error: "",
-        onChange: (e: Event) => this.handleFieldChange("nickname", e),
-        onBlur: (e: Event) => this.handleFieldBlur("nickname", e),
+        onChange: (e: Event) => this.handleFieldChange("display_name", e),
+        onBlur: (e: Event) => this.handleFieldBlur("display_name", e),
       }),
       PhoneItem: new ProfileDataItem({
         title: "Телефон",
@@ -120,7 +120,8 @@ export default class EditProfilePage extends Block {
     const validation = Validator.validate(fieldName, value, this.props.formState);
     
     // Обновляем соответствующий ProfileDataItem компонент
-    const itemComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`];
+    const componentName = fieldName === "display_name" ? "DisplayNameItem" : `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`;
+    const itemComponent = this.children[componentName];
     if (itemComponent && !Array.isArray(itemComponent)) {
       itemComponent.setProps({
         value,
@@ -146,7 +147,8 @@ export default class EditProfilePage extends Block {
     const validation = Validator.validate(fieldName, value, this.props.formState);
     
     // Обновляем соответствующий ProfileDataItem компонент
-    const itemComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`];
+    const componentName = fieldName === "display_name" ? "DisplayNameItem" : `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`;
+    const itemComponent = this.children[componentName];
     if (itemComponent && !Array.isArray(itemComponent)) {
       itemComponent.setProps({
         error: validation.isValid ? "" : validation.errorMessage,
@@ -165,7 +167,7 @@ export default class EditProfilePage extends Block {
     e.preventDefault();
     
     // Валидация всех полей при submit
-    const fields = ['email', 'login', 'first_name', 'second_name', 'phone'];
+    const fields = ['email', 'login', 'first_name', 'second_name', 'display_name', 'phone'];
     let hasErrors = false;
     const newErrors: Record<string, string> = {};
 
@@ -178,7 +180,8 @@ export default class EditProfilePage extends Block {
         newErrors[fieldName] = validation.errorMessage;
         
         // Обновляем соответствующий ProfileDataItem компонент
-        const itemComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`];
+        const componentName = fieldName === "display_name" ? "DisplayNameItem" : `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`;
+        const itemComponent = this.children[componentName];
         if (itemComponent && !Array.isArray(itemComponent)) {
           itemComponent.setProps({
             error: validation.errorMessage,
