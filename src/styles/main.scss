@@ -1,7 +1,7 @@
 // Imports
 
-@import 'variables';
-@import 'mixins';
+@use 'variables' as *;
+@use 'mixins' as *;
 
 // General settings
 
@@ -10,18 +10,14 @@ h1, h2, h3, h4, h5, h6,
 input, textarea, select, button {
     all: unset;
     text-decoration: inherit;
-    font-family: 'Inter';
+    font-family: Inter, sans-serif;
     font-style: normal;
     font-weight: 500px;
     color: $text-color;
-    margin: 0px;
+    margin: 0;
 }
 
-.button, a { 
-    cursor: pointer;
-}
-
-a {
+.button { 
     cursor: pointer;
 }
 
@@ -50,20 +46,17 @@ a {
         font-size: 20px;
     }
 
-    &__input {
+    &__input-wrapper {
         margin-top: 32px;
-        padding-left: 0px;
-        padding-bottom: 7px;
         display: block;
-        width: 280px;
-        border: none;
-        outline: none;
-        border-bottom: 1px solid $primary-color;
-
-        &::placeholder {
-            font-weight: 500;
-            font-size: 13px;
-            color: #999;
+        width: 280px; 
+        
+        .input-component {
+            width: 100%;
+        }
+        
+        .input-component__element {
+            @include input-auth;
         }
     }
 
@@ -77,6 +70,7 @@ a {
         color: $primary-color;
         margin-top: 14px;
         font-size: 11px;
+        cursor: pointer;
     }
 }
 
@@ -90,7 +84,7 @@ a {
 
 // Pages: 404, 500
 
-.error-msg {
+.error-page {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -110,10 +104,13 @@ a {
         color: $primary-color;
         margin-top: 14px;
         font-size: 11px;
+        cursor: pointer;
     }
 }
 
 // Pages: main
+
+// Левая панель
 
 .chats-menu {
     width: 25%;
@@ -124,44 +121,284 @@ a {
     &-nav {
         display: flex;
         flex-direction: column;
-        border-bottom: 1px solid $bg-white-border;
-        padding: 20px 10px 15px 10px;
+        padding: 20px 10px 0;
 
-        &__profile-link {
-            text-align: right;
+        &__profile-link { 
             color: #999;
             font-size: 15px;
             margin-bottom: 20px;
+            display: inline-block; 
+            margin-left: auto;
+            cursor: pointer;
         }
 
         &__form {
-
             &_input {
-                background-color: #EFEFEF;
-                width: 100%;
-                padding: 10px 0;
-                border-radius: 5px;
-
-                &::placeholder {
-                    text-align: center;
-                }
+                @include input-search;
             }
         }
     }
 }
 
-.chats-picked {
-    width: 75%;
-    height: 100vh;
+.chat-card {
     display: flex;
-    justify-content: center;
-    align-items: center;    
-    height: 100vh;          
-    width: 100vw;           
+    padding: 12px 10px;
+    cursor: pointer;
+    border-top: 1px solid $bg-white-border;
+    border-color: $bg-white-border;
+
+    &__avatar-wrapper {
+        margin-right: 3%;
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #e0e0e0;
+
+        &_image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+
+        &_name {
+            font-weight: 600;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        &_last-message {
+            flex-wrap: wrap;
+            display: block;
+            font-size: 12px;
+            line-height: 15px;
+        }
+    }
+
+    &__numbers {
+        display: flex;
+        flex-direction: column;
+        margin-left: auto;
+        justify-content: space-between;
+
+        &_message-time {
+            font-weight: 500;
+            font-size: 9px;
+            line-height: 13px;
+            color: #999;
+        }
+
+        &_unread-count {
+            font-weight: 500;
+            font-size: 11px;
+            color: #FFF;
+            padding: 4px 8px;
+            border-radius: 16px;
+            background-color: $primary-color;
+        }
+    }
 }
 
-// Pages: profile, edit-profile, edit-password
 
+
+// Правая панель
+
+.picked-chat {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background-color: #f8f8f8;
+    height: 100vh;
+
+    &__nothing-picked {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        color: #999;
+        font-size: 16px;
+        text-align: center;
+        padding: 20px;
+
+        &_text {
+        margin: 0;
+        }
+    }
+
+    &__message-form {
+        display: flex;
+        justify-content: space-between;
+        height: 6%;
+        background-color: #f5f5f5;
+        border-top: 1px solid #eaeaea;
+        padding: 10px 20px;
+        align-items: center;
+
+        &_file-img {
+            cursor: pointer;
+            margin-right: 1%;
+        }
+
+        &_file-input-hidden {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        &_input {
+            @include input-message;
+            
+            .input-component {
+                &__element {
+                    &::placeholder {
+                        text-align: left;
+                      }
+                }
+            }
+        }
+
+        &_send-message-btn {
+            cursor: pointer;
+            margin-left: 1%;
+        }
+    }
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #eaeaea;
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #e0e0e0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__user-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  &__status {
+    margin: 0;
+    font-size: 12px;
+    color: #999;
+  }
+
+  &__menu {
+    display: flex;
+    align-items: center;
+  }
+
+  &__menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+
+  &__menu-dots {
+    font-size: 18px;
+    color: #666;
+    line-height: 1;
+  }
+}
+
+.chat-messages {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f8f8f8;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  overflow-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+
+  // Сообщения собеседника (слева)
+  align-self: flex-start;
+  background-color: #e0e0e0;
+  color: #000;
+
+  &--mine {
+    // Мои сообщения (справа)
+    align-self: flex-end;
+    background-color: #36f;
+
+    .message__content {
+        color: $bg-white;
+    }
+  }
+
+  &__content {
+    margin: 0;
+    padding: 0;
+    overflow-wrap: break-word;
+  }
+
+  &__time {
+    font-size: 10px;
+    color: rgb(0 0 0 / 60%);
+    margin-top: 4px;
+    align-self: flex-end;
+
+    .message--mine & {
+      color: rgb(255 255 255 / 70%);
+    }
+  }
+}
+
+
+// Pages: profile, edit-profile, edit-password !!!
 
 
 .link-back{
@@ -181,8 +418,8 @@ a {
     justify-content: center;
     align-items: center; 
 
-    &__avatar-link {
-        margin-bottom: 21px;
+    &__avatar {
+        margin-bottom: 30px;
     }
 
     &__title {
@@ -215,10 +452,27 @@ a {
             text-align: right;
             font-size: 13px;
             color: #999;
+            border: none;
+            outline: none;
+            background: transparent;
+            transition: border-color 0.2s ease;
+
+            &--error {
+                border-bottom: 1px solid $error-color;
+                color: $error-color;
+            }
         }
     }
 
-    &__setting {
+    &__error {
+        color: $error-color;
+        font-size: 11px;
+        margin-top: 4px;
+        text-align: right;
+        display: block;
+    }
+
+    &__settings {
         display: flex;
         flex-direction: column;
         text-align: left;
@@ -233,7 +487,7 @@ a {
         }
 
         &_exit {
-            color: #FF0000 !important;
+            color: $error-color !important;
             border-bottom: none;
         }
     }
@@ -270,17 +524,38 @@ a {
     padding: 0;
 }
 
-.cheatpages-list__page_link {
+.cheatpages-list__page_link { // cheat-page__links
     @include button;
+
     color: $text-color;
     border: 1px solid $text-color;
     font-size: 15px;
     cursor: pointer;
     padding: 15px;
-}
-
-.cheatpages-list__page_link {
     display: inline-block;
     margin-top: 20px;
+}
+
+// Input validation styles CURSOR
+.input-component {
+    position: relative;
+    margin-bottom: 16px;
+
+    &__container {
+        display: block;
+        position: relative;
+    }
+
+    &__element {
+        @include input-search;
+    }
+
+    &__error {
+        color: $error-color;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
 }
 

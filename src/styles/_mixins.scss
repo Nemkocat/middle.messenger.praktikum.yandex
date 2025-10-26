@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 @mixin button($width: 280px, $bg-color: $primary-color, $text-color: #fff) {
   min-width: $width;
   border: none;
@@ -6,13 +8,105 @@
   color: $text-color;
   font-size: 13px;
   text-align: center;
-  padding: 12px 0px;
+  padding: 12px 0;
   outline: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
   
-  &:hover {
-    background: darken($bg-color, 10%);
+  &:hover {    
+    background: #4d7bee;
   }
+}
+
+
+// Базовая настройка инпута
+@mixin input(
+  $width: 100%,
+  $padding: 10px 12px,
+  $border-color: #e0e0e0,
+  $border-radius: 0px,
+  $font-size: 14px,
+  $background: transparent,
+  $placeholder-color: #999
+) {
+  width: $width;
+  padding: $padding;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  font-size: $font-size;
+  background: $background;
+  outline: none;
+  transition: border-color 0.2s ease;
+  cursor: text;
+
+  &::placeholder {
+    color: $placeholder-color;
+  }
+
+  &--error {
+    border-color: $error-color;
+  }
+}
+
+// Специфичные инпуты и их настройка
+
+// Инпуты для страниц: login, register
+@mixin input-auth(
+  $width: 280px,
+  $border-bottom-color: $primary-color,
+  $font-size: 13px,
+  $padding: 0 0 5px 0,
+  $placeholder-color: #999
+) {
+  width: $width;
+  padding: $padding;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid $border-bottom-color;
+  font-size: $font-size;
+  background: transparent;
+  outline: none;
+  transition: border-bottom-color 0.2s ease;
+
+  &::placeholder {
+    font-weight: 500;
+    color: $placeholder-color;
+    text-align: left;
+  }
+}
+
+// Mixin для поискового инпута на странице main (левая панель)
+@mixin input-search(
+  $width: 100%,
+  $padding: 10px 0,
+  $background: #EFEFEF,
+  $border-radius: 5px,
+  $text-align: center
+) {
+  width: $width;
+  padding: $padding;
+  background: $background;
+  border-radius: $border-radius;
+  border: none;
+  outline: none;
+
+  &::placeholder {
+    text-align: $text-align;
+  }
+}
+
+// Mixin для отправки сообщения на странице main (правая панель)
+@mixin input-message(
+  $width: 100%,
+  $padding: 10px 20px,
+  $border-color: #eaeaea,
+  $border-radius: 20px,
+  $background: $bg-white,
+) {
+  width: $width;
+  padding: $padding;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  outline: none;
 }
 
