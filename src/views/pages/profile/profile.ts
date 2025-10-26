@@ -70,10 +70,10 @@ export default class ProfilePage extends Block {
         type: "text",
         editable: false,
       }),
-      NicknameItem: new ProfileDataItem({
+      DisplayNameItem: new ProfileDataItem({
         title: "Имя в чате",
         value: "Иван",
-        name: "nickname",
+        name: "display_name",
         type: "text",
         editable: false,
       }),
