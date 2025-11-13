@@ -39,9 +39,18 @@ export default class HTTPTransport {
       }
 
       xhr.open(method, requestUrl, true);
+      
+      // Включаем отправку cookies для авторизации
+      xhr.withCredentials = true;
 
       // Установка заголовков
-      if (options.headers) {
+      // Для FormData НЕ устанавливаем Content-Type - браузер установит его сам с boundary
+      // Также НЕ устанавливаем никакие другие заголовки для FormData, чтобы избежать preflight запроса
+      const isFormData = options.data instanceof FormData;
+      
+      // Для FormData не устанавливаем НИКАКИЕ заголовки вручную
+      // Браузер сам установит Content-Type с boundary, и это не вызовет preflight
+      if (options.headers && !isFormData) {
         Object.entries(options.headers).forEach(([key, value]) => {
           xhr.setRequestHeader(key, value);
         });
@@ -51,10 +60,18 @@ export default class HTTPTransport {
       xhr.onload = () => {
         let responseData: unknown;
         try {
-          responseData = JSON.parse(xhr.responseText);
+          // Пытаемся распарсить JSON, даже если статус не 200
+          const text = xhr.responseText || '';
+          if (text.trim()) {
+            responseData = JSON.parse(text);
+          } else {
+            responseData = null;
+          }
         } catch {
-          responseData = xhr.responseText;
+          // Если не JSON, возвращаем текст как есть
+          responseData = xhr.responseText || null;
         }
+
 
         resolve({
           status: xhr.status,
@@ -64,7 +81,25 @@ export default class HTTPTransport {
       };
 
       xhr.onerror = () => {
-        reject(new Error(`Network error: ${xhr.statusText}`));
+        // Проверяем, не является ли это CORS ошибкой
+        const errorMessage = xhr.statusText || 'Network error';
+        let detailedError = `Network error: ${errorMessage}`;
+        
+        // Если статус 0 и нет ответа, это может быть CORS ошибка
+        if (xhr.status === 0 && !xhr.responseText) {
+          detailedError = 'CORS error: Запрос заблокирован политикой CORS. Проверьте настройки сервера и убедитесь, что запрос отправляется с правильными заголовками.';
+        }
+        
+        console.error(`[HTTPTransport] Request error:`, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          readyState: xhr.readyState,
+          method,
+          url: requestUrl,
+          isFormData: options.data instanceof FormData,
+        });
+        
+        reject(new Error(detailedError));
       };
 
       xhr.ontimeout = () => {
@@ -103,27 +138,48 @@ export default class HTTPTransport {
   }
 
   post<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
+    // Если данные - FormData, не устанавливаем Content-Type (браузер установит автоматически)
+    const isFormData = options.data instanceof FormData;
     return this.createRequest<T>('POST', url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: isFormData
+        ? options.headers
+        : {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
     });
   }
 
   put<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
+    // Если данные - FormData, НЕ передаем НИКАКИЕ заголовки, чтобы избежать CORS preflight
+    const isFormData = options.data instanceof FormData;
     return this.createRequest<T>('PUT', url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: isFormData
+        ? undefined // Для FormData не передаем заголовки вообще
+        : {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
     });
   }
 
   delete<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest<T>('DELETE', url, options);
+    // Если данные - FormData, не устанавливаем Content-Type (браузер установит автоматически)
+    const isFormData = options.data instanceof FormData;
+    return this.createRequest<T>('DELETE', url, {
+      ...options,
+      headers: isFormData
+        ? options.headers
+        : options.data
+          ? {
+              'Content-Type': 'application/json',
+              ...options.headers,
+            }
+          : options.headers,
+    });
   }
 }
+
 

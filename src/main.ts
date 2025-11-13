@@ -22,6 +22,13 @@ registerComponent(ChatArea);
 
 // Инициализация приложения после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
-    new App();
+    const app = new App();
+    
+    // Для удобства отладки: делаем роутер доступным глобально
+    // В консоли браузера можно использовать: window.router.go("/messenger")
+    const router = app.getRouter();
+    if (router) {
+        window.router = router;
+    }
 });
 

@@ -23,14 +23,54 @@ export default class ChatList extends Block {
         click: (e: Event) => {
           const target = e.target as HTMLElement;
           const chatCard = target.closest('.chat-card') as HTMLElement;
-          if (chatCard && props.onChatClick) {
-            const chatId = chatCard.getAttribute('data-chat-id');
-            const chat = props.chats.find(c => c.id === chatId);
-            if (chat) {
-              props.onChatClick(chat);
+          if (chatCard) {
+            // Используем текущие props, а не props из конструктора
+            const currentProps = this.props as ChatListProps;
+            if (currentProps.onChatClick) {
+              const chatId = chatCard.getAttribute('data-chat-id');
+              const chat = currentProps.chats?.find(c => c.id === chatId);
+              if (chat) {
+                currentProps.onChatClick(chat);
+              }
             }
           }
         }
+      }
+    });
+  }
+
+  componentDidUpdate(oldProps: ChatListProps, newProps: ChatListProps): boolean {
+    // Если изменился список чатов, перерисовываем компонент
+    const chatsChanged = oldProps.chats !== newProps.chats;
+    const lengthChanged = oldProps.chats?.length !== newProps.chats?.length;
+    
+    if (chatsChanged || lengthChanged) {
+      // При обновлении нужно перепривязать обработчики ошибок для новых изображений
+      // Вызываем attachImageErrorHandlers после перерисовки
+      setTimeout(() => {
+        this.attachImageErrorHandlers();
+      }, 0);
+      return true;
+    }
+    return false;
+  }
+
+  componentDidMount() {
+    this.attachImageErrorHandlers();
+  }
+
+  private attachImageErrorHandlers() {
+    // Добавляем обработчики ошибок загрузки изображений
+    const images = this._element?.querySelectorAll('img.chat-card__avatar-wrapper_image');
+    images?.forEach((img) => {
+      const imageElement = img as HTMLImageElement;
+      // Проверяем, не привязан ли уже обработчик
+      if (!(imageElement as any).__errorHandlerAttached) {
+        const errorHandler = () => {
+          imageElement.src = '/images/default-avatar.png';
+        };
+        imageElement.addEventListener('error', errorHandler);
+        (imageElement as any).__errorHandlerAttached = true;
       }
     });
   }

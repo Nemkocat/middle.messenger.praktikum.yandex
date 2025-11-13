@@ -33,6 +33,10 @@ input, textarea, select, button {
     display: flex;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 // Pages: login, register
 
 .auth-form {
@@ -57,6 +61,7 @@ input, textarea, select, button {
         
         .input-component__element {
             @include input-auth;
+            cursor: text;
         }
     }
 
@@ -122,6 +127,20 @@ input, textarea, select, button {
         display: flex;
         flex-direction: column;
         padding: 20px 10px 0;
+
+        &__controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        &__create-chat-btn {
+            color: #999;
+            font-size: 15px;
+            margin-bottom: 20px;
+            display: inline-block;
+            cursor: pointer;
+        }
 
         &__profile-link { 
             color: #999;
@@ -198,8 +217,13 @@ input, textarea, select, button {
             font-weight: 500;
             font-size: 11px;
             color: #FFF;
-            padding: 4px 8px;
-            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 2px;
+            border-radius: 50%;
             background-color: $primary-color;
         }
     }
@@ -260,6 +284,7 @@ input, textarea, select, button {
                 &__element {
                     &::placeholder {
                         text-align: left;
+                        cursor: text;
                       }
                 }
             }
@@ -421,6 +446,86 @@ input, textarea, select, button {
     &__avatar {
         margin-bottom: 30px;
     }
+}
+
+// Avatar upload component
+.avatar-upload {
+    &__wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    &__label {
+        display: inline-block;
+        cursor: pointer;
+        position: relative;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 0.8;
+        }
+
+        &--loading {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    }
+
+    &__input {
+        display: none;
+    }
+
+    &__loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        z-index: 10;
+    }
+
+    &__spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(51, 105, 243, 0.2);
+        border-top-color: #3369f3;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    &__loading-text {
+        font-size: 12px;
+        color: #3369f3;
+        font-weight: 500;
+    }
+
+    &__text {
+        display: block;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.profile__avatar_img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.profile-data {
 
     &__title {
         font-size: 16px;    
@@ -536,7 +641,7 @@ input, textarea, select, button {
     margin-top: 20px;
 }
 
-// Input validation styles CURSOR
+// Input validation styles
 .input-component {
     position: relative;
     margin-bottom: 16px;
@@ -558,4 +663,94 @@ input, textarea, select, button {
     }
 
 }
+
+// Modal styles
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+
+    &--open {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1002;
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 40px 30px;
+        min-width: 340px;
+        max-width: 90%;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.14);
+    }
+
+    &__title {
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 20px;
+        color: #1e1e1e;
+        margin: 0 0 20px 0;
+        text-align: center;
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    &__input-wrapper {
+        width: 280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    &__input {
+        @include input;
+        width: 280px;
+        border: none;
+        border-bottom: 1px solid $text-color;
+        border-bottom-color: $text-color;
+
+        &:focus {
+            border-bottom-color: $primary-color;
+        }
+
+    }
+
+    &__error {
+        color: $error-color;
+        font-size: 11px;
+        margin-top: 4px;
+        text-align: center;
+        display: block;
+    }
+
+    &__button {
+        @include button;
+    }
+}
+// СГЕНЕРИРОВАНО CURSOR
 

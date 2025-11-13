@@ -11,6 +11,8 @@ export default function renderDOM(block: Block): void {
   const content = block.getContent();
   if (content) {
     root.appendChild(content);
+    // Вызываем componentDidMount для корневого компонента и всех дочерних
+    block.dispatchComponentDidMount();
   }
 }
 

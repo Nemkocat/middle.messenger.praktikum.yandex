@@ -3,6 +3,8 @@ import ProfileDataItem from "../../components/ProfileDataItem";
 import Link from "../../components/Link";
 import Button from "../../components/Button";
 import { Validator } from "../../../utils/validation";
+import UserAPI from "../../../services/UserAPI";
+import { Router } from "../../../core/router";
 import editPasswordTemplate from "./editPassword.hbs?raw";
 
 export default class EditPasswordPage extends Block {
@@ -24,15 +26,19 @@ export default class EditPasswordPage extends Block {
         class: "link-back",
         page: "profile",
         text: "",
-        img: "./images/arrow.png",
-        imgClass: "",
+        img: "/images/arrow.png",
+        imgClass: "pointer",
         imgAlt: "←"
       }),
       SaveButton: new Button({
         class: "profile-data__submit-btn",
         id: "edit-password-btn",
         text: "Сохранить",
-        onClick: (e: Event) => this.handleSubmit(e),
+        type: "button",
+        disabled: false,
+        onClick: (e: Event) => {
+          this.handleSubmit(e);
+        },
       }),
       OldPasswordItem: new ProfileDataItem({
         title: "Старый пароль",
@@ -76,7 +82,8 @@ export default class EditPasswordPage extends Block {
     const validation = Validator.validate(fieldName, value, this.props.formState);
     
     // Обновляем соответствующий ProfileDataItem компонент
-    const itemComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`];
+    const componentName = this.getComponentName(fieldName);
+    const itemComponent = this.children[componentName];
     if (itemComponent && !Array.isArray(itemComponent)) {
       itemComponent.setProps({
         value,
@@ -135,7 +142,8 @@ export default class EditPasswordPage extends Block {
     const validation = Validator.validate(fieldName, value, this.props.formState);
     
     // Обновляем соответствующий ProfileDataItem компонент
-    const itemComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`];
+    const componentName = this.getComponentName(fieldName);
+    const itemComponent = this.children[componentName];
     if (itemComponent && !Array.isArray(itemComponent)) {
       itemComponent.setProps({
         error: validation.isValid ? "" : validation.errorMessage,
@@ -150,8 +158,9 @@ export default class EditPasswordPage extends Block {
     });
   }
 
-  handleSubmit(e: Event) {
+  async handleSubmit(e: Event): Promise<void> {
     e.preventDefault();
+    e.stopPropagation();
     
     // Валидация всех полей при submit
     const fields = ['oldPassword', 'newPassword', 'confirmPassword'];
@@ -167,7 +176,8 @@ export default class EditPasswordPage extends Block {
         newErrors[fieldName] = validation.errorMessage;
         
         // Обновляем соответствующий ProfileDataItem компонент
-        const itemComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`];
+        const componentName = this.getComponentName(fieldName);
+        const itemComponent = this.children[componentName];
         if (itemComponent && !Array.isArray(itemComponent)) {
           itemComponent.setProps({
             error: validation.errorMessage,
@@ -184,12 +194,73 @@ export default class EditPasswordPage extends Block {
 
     // Если есть ошибки, не отправляем форму
     if (hasErrors) {
-      console.log("Form has validation errors");
       return;
     }
 
     // Если валидация прошла успешно
-    console.log("Password updated:", this.props.formState);
+    try {
+      await UserAPI.updatePassword({
+        oldPassword: this.props.formState.oldPassword,
+        newPassword: this.props.formState.newPassword,
+      });
+      
+      // Перенаправляем на страницу профиля
+      const router = Router.getInstance();
+      if (router) {
+        router.go('/settings');
+      }
+    } catch (error) {
+      console.error('[EditPasswordPage] Password update error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка обновления пароля';
+      
+      // Определяем, какое поле вызвало ошибку
+      let errorField = 'oldPassword'; // По умолчанию показываем ошибку на старом пароле
+      const errorLower = errorMessage.toLowerCase();
+      
+      if (errorLower.includes('новый') || errorLower.includes('new') || 
+          errorLower.includes('newpassword')) {
+        errorField = 'newPassword';
+      } else if (errorLower.includes('старый') || errorLower.includes('old') ||
+                 errorLower.includes('oldpassword') || errorLower.includes('неверный')) {
+        errorField = 'oldPassword';
+      }
+      
+      this.setProps({
+        errors: {
+          ...this.props.errors,
+          [errorField]: errorMessage,
+        }
+      });
+      
+      // Обновляем соответствующий компонент
+      const componentName = this.getComponentName(errorField);
+      const itemComponent = this.children[componentName];
+      if (itemComponent && !Array.isArray(itemComponent)) {
+        itemComponent.setProps({
+          error: errorMessage,
+        });
+      }
+    }
+  }
+
+  // Вспомогательный метод для получения имени компонента
+  private getComponentName(fieldName: string): string {
+    const nameMap: Record<string, string> = {
+      oldPassword: 'OldPasswordItem',
+      newPassword: 'NewPasswordItem',
+      confirmPassword: 'ConfirmPasswordItem',
+    };
+    return nameMap[fieldName] || `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`;
+  }
+
+  componentDidMount() {
+    // Привязываем событие submit к форме напрямую
+    const form = this._element?.querySelector('form.profile-data') as HTMLFormElement;
+    if (form) {
+      form.addEventListener('submit', (e: Event) => {
+        this.handleSubmit(e);
+      });
+    }
   }
 
   render(): string {

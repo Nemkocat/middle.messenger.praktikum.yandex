@@ -79,6 +79,7 @@ export default class Block {
       
       const { tagName, props } = this._meta;
       this._element = this._createDocumentElement(tagName);
+      
       if (typeof props.className === "string") {
         const classes = props.className.split(" ").filter(Boolean);
         if (classes.length > 0) {
@@ -88,7 +89,16 @@ export default class Block {
 
       if (typeof props.attrs === "object") {
         Object.entries(props.attrs).forEach(([attrName, attrValue]) => {
+          // Для disabled атрибута: если значение false, удаляем атрибут, иначе устанавливаем
+          if (attrName === 'disabled') {
+            if (attrValue === false || attrValue === 'false' || attrValue === '') {
+              this._element!.removeAttribute('disabled');
+            } else {
+              this._element!.setAttribute(attrName, '');
+            }
+          } else {
           this._element!.setAttribute(attrName, String(attrValue));
+          }
         });
       }
     }
@@ -223,6 +233,7 @@ export default class Block {
 
   _render() {
     this._removeEvents();
+    
     const block = this._compile();
 
     if (this._element!.children.length === 0) {
