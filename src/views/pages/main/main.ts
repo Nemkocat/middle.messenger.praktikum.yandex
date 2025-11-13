@@ -12,6 +12,15 @@ interface MainPageProps {
   chatController?: ChatController;
 }
 
+interface MainPageState {
+  chats?: unknown[];
+  selectedChat?: unknown;
+  isCreateChatModalOpen?: boolean;
+  isDeleteChatModalOpen?: boolean;
+  currentChatId?: number | null;
+  messages?: unknown[];
+}
+
 export default class MainPage extends Block {
   private chatController: ChatController;
 
@@ -57,13 +66,15 @@ export default class MainPage extends Block {
         onClose: () => {
           this.setProps({ isCreateChatModalOpen: false });
         },
-        onSubmit: async (login: string) => {
-          await this.chatController.createChatWithUser(login);
-          // Обновляем список чатов в MainPage после создания
-          const updatedChats = this.chatController.getChats();
-          this.setProps({ chats: updatedChats });
+        onSubmit: async (login?: string) => {
+          if (login) {
+            await this.chatController.createChatWithUser(login);
+            // Обновляем список чатов в MainPage после создания
+            const updatedChats = this.chatController.getChats();
+            this.setProps({ chats: updatedChats });
+          }
         },
-      } as any),
+      }),
       DeleteChatModal: new Modal({
         isOpen: false,
         title: "Удалить чат",
@@ -73,7 +84,8 @@ export default class MainPage extends Block {
           this.setProps({ isDeleteChatModalOpen: false, currentChatId: null });
         },
         onSubmit: async () => {
-          const chatId = (this.props as any).currentChatId;
+          const props = this.props as MainPageState;
+          const chatId = props.currentChatId;
           if (chatId !== null && chatId !== undefined) {
             try {
               await this.chatController.deleteChat(chatId);
@@ -91,7 +103,7 @@ export default class MainPage extends Block {
             }
           }
         },
-      } as any),
+      }),
       ChatListComponent: new ChatList({
         chats: props.chatController?.getChats() || [],
         onChatClick: props.chatController?.onChatClick,
@@ -128,8 +140,8 @@ export default class MainPage extends Block {
 
   componentDidUpdate(oldProps: unknown, newProps: unknown): boolean {
     // Приводим к нужному типу для безопасного доступа к свойствам
-    const oldPropsTyped = oldProps as { selectedChat?: unknown; isCreateChatModalOpen?: boolean; chats?: unknown[] };
-    const newPropsTyped = newProps as { selectedChat?: unknown; isCreateChatModalOpen?: boolean; chats?: unknown[] };
+    const oldPropsTyped = oldProps as MainPageState;
+    const newPropsTyped = newProps as MainPageState;
     
     let shouldRerender = false;
     
@@ -144,8 +156,8 @@ export default class MainPage extends Block {
     }
 
     // Обновляем состояние модального окна удаления чата
-    const oldDeleteModalOpen = (oldPropsTyped as any).isDeleteChatModalOpen;
-    const newDeleteModalOpen = (newPropsTyped as any).isDeleteChatModalOpen;
+    const oldDeleteModalOpen = oldPropsTyped.isDeleteChatModalOpen;
+    const newDeleteModalOpen = newPropsTyped.isDeleteChatModalOpen;
     if (oldDeleteModalOpen !== newDeleteModalOpen) {
       const { DeleteChatModal } = this.children;
       if (DeleteChatModal && !Array.isArray(DeleteChatModal)) {
@@ -170,12 +182,12 @@ export default class MainPage extends Block {
     }
     
     // Проверяем изменения в сообщениях
-    const oldMessages = (oldPropsTyped as any).messages;
-    const newMessages = (newPropsTyped as any).messages;
+    const oldMessages = oldPropsTyped.messages;
+    const newMessages = newPropsTyped.messages;
     if (oldMessages !== newMessages) {
       const { ChatAreaComponent } = this.children;
       if (ChatAreaComponent && !Array.isArray(ChatAreaComponent)) {
-        const currentChat = (newPropsTyped as any).selectedChat;
+        const currentChat = newPropsTyped.selectedChat;
         if (currentChat) {
           ChatAreaComponent.setProps({
             chat: {

@@ -18,7 +18,6 @@ export class Route {
   private _blockFactory: BlockFactory | null = null;
   private _block: Block | null = null;
   // _props хранится для возможного будущего использования (например, для передачи rootQuery в блоки)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private _props: RouteProps;
 
   constructor(

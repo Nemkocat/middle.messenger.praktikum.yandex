@@ -167,7 +167,7 @@ export default class ChatArea extends Block {
     });
     
     // Сбрасываем флаг после небольшой задержки
-    setTimeout(() => {
+    window.setTimeout(() => {
       this.isSubmitting = false;
     }, 100);
   }

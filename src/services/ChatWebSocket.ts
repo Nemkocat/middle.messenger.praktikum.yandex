@@ -210,7 +210,7 @@ class ChatWebSocket {
    */
   private stopPing(): void {
     if (this.pingInterval !== null) {
-      clearInterval(this.pingInterval);
+      window.clearInterval(this.pingInterval);
       this.pingInterval = null;
     }
   }

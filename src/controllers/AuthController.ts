@@ -26,7 +26,7 @@ class AuthController {
       const user = await AuthAPI.getUser();
       this.currentUser = user;
       return true;
-    } catch (error) {
+    } catch {
       // Игнорируем ошибку 401 (Unauthorized) - это нормальная ситуация для неавторизованного пользователя
       this.currentUser = null;
       return false;
@@ -62,48 +62,27 @@ class AuthController {
       return { isValid: false, errors };
     }
 
-    try {
-      await AuthAPI.signUp({
-        first_name: data.first_name,
-        second_name: data.second_name,
-        login: data.login,
-        email: data.email,
-        password: data.password,
-        phone: data.phone,
-      });
-      
-      // После успешной регистрации проверяем, авторизован ли пользователь
-      // После регистрации API может автоматически авторизовать пользователя
-      try {
-        const user = await AuthAPI.getUser();
-        this.currentUser = user;
-        
-        // Навигация в контроллере через window.router
-        const router = this.getRouter();
-        if (router) {
-          router.go('/messenger');
-        }
-        
-        return { isValid: true };
-      } catch (getUserError) {
-        // Если getUser не удался, пытаемся войти вручную
-        try {
-          const signInResult = await this.signIn({ login: data.login, password: data.password });
-          // Если валидация входа не прошла, пробрасываем ошибку
-          if (!signInResult.isValid) {
-            throw new Error('Ошибка входа после регистрации');
-          }
-          // signIn уже сделал навигацию, просто возвращаем успех
-          return { isValid: true };
-        } catch (signInError) {
-          // Если вход не удался после регистрации, пробрасываем ошибку входа
-          throw signInError;
-        }
-      }
-    } catch (error) {
-      // Пробрасываем ошибку регистрации
-      throw error;
+    await AuthAPI.signUp({
+      first_name: data.first_name,
+      second_name: data.second_name,
+      login: data.login,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+    });
+    
+    // После успешной регистрации проверяем, авторизован ли пользователь
+    // После регистрации API может автоматически авторизовать пользователя
+    const user = await AuthAPI.getUser();
+    this.currentUser = user;
+    
+    // Навигация в контроллере через window.router
+    const router = this.getRouter();
+    if (router) {
+      router.go('/messenger');
     }
+    
+    return { isValid: true };
   }
 
   async signIn(data: { login: string; password: string }): Promise<{ isValid: boolean; errors?: Record<string, string> }> {
@@ -128,23 +107,18 @@ class AuthController {
       return { isValid: false, errors };
     }
 
-    try {
-      await AuthAPI.signIn(data);
-      // Получаем данные пользователя после успешного входа
-      const user = await AuthAPI.getUser();
-      this.currentUser = user;
-      
-      // Навигация в контроллере через window.router
-      const router = this.getRouter();
-      if (router) {
-        router.go('/messenger');
-      }
-      
-      return { isValid: true };
-    } catch (error) {
-      console.error('Sign in error:', error);
-      throw error;
+    await AuthAPI.signIn(data);
+    // Получаем данные пользователя после успешного входа
+    const user = await AuthAPI.getUser();
+    this.currentUser = user;
+    
+    // Навигация в контроллере через window.router
+    const router = this.getRouter();
+    if (router) {
+      router.go('/messenger');
     }
+    
+    return { isValid: true };
   }
 
   async logout(): Promise<void> {

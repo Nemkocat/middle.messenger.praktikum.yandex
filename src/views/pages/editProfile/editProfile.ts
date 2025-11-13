@@ -92,7 +92,7 @@ export default class EditProfilePage extends Block {
             }
             
             // Показываем ошибку пользователю
-              alert(errorMessage);
+              window.alert(errorMessage);
             } finally {
               // Сбрасываем значение input, чтобы можно было выбрать тот же файл снова
               target.value = '';
@@ -285,7 +285,7 @@ export default class EditProfilePage extends Block {
     };
     
     try {
-      const updatedUser = await UserAPI.updateProfile(updateData);
+      await UserAPI.updateProfile(updateData);
       
       // Обновляем данные пользователя в AuthController
       await AuthController.checkAuth();
@@ -297,7 +297,7 @@ export default class EditProfilePage extends Block {
       }
     } catch (error) {
       console.error('[EditProfilePage] Profile update error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Ошибка обновления профиля';
+      let errorMessage = error instanceof Error ? error.message : 'Ошибка обновления профиля';
       
       // Пытаемся определить, какое поле вызвало ошибку
       let errorField = 'email'; // По умолчанию показываем ошибку на email

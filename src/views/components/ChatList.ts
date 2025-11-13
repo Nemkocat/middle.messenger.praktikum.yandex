@@ -14,6 +14,9 @@ interface ChatListProps {
   onChatClick?: (chat: Chat) => void;
 }
 
+// WeakMap для хранения флагов обработчиков ошибок изображений
+const errorHandlerMap = new WeakMap<HTMLImageElement, boolean>();
+
 export default class ChatList extends Block {
   constructor(props: ChatListProps) {
     super("ul", {
@@ -47,7 +50,7 @@ export default class ChatList extends Block {
     if (chatsChanged || lengthChanged) {
       // При обновлении нужно перепривязать обработчики ошибок для новых изображений
       // Вызываем attachImageErrorHandlers после перерисовки
-      setTimeout(() => {
+      window.setTimeout(() => {
         this.attachImageErrorHandlers();
       }, 0);
       return true;
@@ -64,13 +67,13 @@ export default class ChatList extends Block {
     const images = this._element?.querySelectorAll('img.chat-card__avatar-wrapper_image');
     images?.forEach((img) => {
       const imageElement = img as HTMLImageElement;
-      // Проверяем, не привязан ли уже обработчик
-      if (!(imageElement as any).__errorHandlerAttached) {
+      // Проверяем, не привязан ли уже обработчик через WeakMap
+      if (!errorHandlerMap.get(imageElement)) {
         const errorHandler = () => {
           imageElement.src = '/images/default-avatar.png';
         };
         imageElement.addEventListener('error', errorHandler);
-        (imageElement as any).__errorHandlerAttached = true;
+        errorHandlerMap.set(imageElement, true);
       }
     });
   }

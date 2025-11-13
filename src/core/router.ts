@@ -32,7 +32,7 @@ export class Router {
 
   start() {
     // Используем addEventListener вместо onpopstate для более надежной работы
-    window.addEventListener("popstate", (event: PopStateEvent) => {
+    window.addEventListener("popstate", () => {
       this._onRoute(window.location.pathname);
     });
 

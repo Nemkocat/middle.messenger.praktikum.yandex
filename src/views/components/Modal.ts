@@ -9,6 +9,12 @@ interface ModalProps {
   onSubmit?: (login?: string) => Promise<void>;
   showForm?: boolean; // Если false, показываем только кнопку без формы
   buttonText?: string; // Текст кнопки
+  formState?: {
+    login?: string;
+  };
+  errors?: {
+    login?: string;
+  };
 }
 
 export default class Modal extends Block {
@@ -76,7 +82,7 @@ export default class Modal extends Block {
           console.error('Error submitting:', error);
           const errorMessage = error instanceof Error ? error.message : 'Ошибка';
           // Для модального окна без формы показываем ошибку через alert
-          alert(errorMessage);
+          window.alert(errorMessage);
         }
       }
       return;
@@ -160,10 +166,10 @@ export default class Modal extends Block {
     }
 
     // Если изменилось состояние формы или ошибок, перерисовываем
-    const oldFormState = (oldProps as any).formState;
-    const newFormState = (newProps as any).formState;
-    const oldErrors = (oldProps as any).errors;
-    const newErrors = (newProps as any).errors;
+    const oldFormState = oldProps.formState;
+    const newFormState = newProps.formState;
+    const oldErrors = oldProps.errors;
+    const newErrors = newProps.errors;
 
     const shouldUpdate = oldFormState?.login !== newFormState?.login ||
       oldErrors?.login !== newErrors?.login;
@@ -171,7 +177,7 @@ export default class Modal extends Block {
     if (shouldUpdate) {
       // Восстанавливаем фокус и позицию курсора после обновления
       if (hadFocus && loginInput) {
-        setTimeout(() => {
+        window.setTimeout(() => {
           const newInput = this._element?.querySelector('input[name="login"]') as HTMLInputElement;
           if (newInput) {
             newInput.focus();

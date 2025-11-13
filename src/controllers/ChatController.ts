@@ -104,7 +104,7 @@ export class ChatController {
   // Получить аватар чата из localStorage
   private getChatAvatarFromStorage(chatId: string): string | null {
     try {
-      const avatars = JSON.parse(localStorage.getItem(this.CHAT_AVATARS_STORAGE_KEY) || '{}');
+      const avatars = JSON.parse(window.localStorage.getItem(this.CHAT_AVATARS_STORAGE_KEY) || '{}');
       return avatars[chatId] || null;
     } catch (error) {
       console.error('[ChatController] Error reading chat avatar from storage:', error);
@@ -115,9 +115,9 @@ export class ChatController {
   // Сохранить аватар чата в localStorage
   private saveChatAvatarToStorage(chatId: string, avatarUrl: string): void {
     try {
-      const avatars = JSON.parse(localStorage.getItem(this.CHAT_AVATARS_STORAGE_KEY) || '{}');
+      const avatars = JSON.parse(window.localStorage.getItem(this.CHAT_AVATARS_STORAGE_KEY) || '{}');
       avatars[chatId] = avatarUrl;
-      localStorage.setItem(this.CHAT_AVATARS_STORAGE_KEY, JSON.stringify(avatars));
+      window.localStorage.setItem(this.CHAT_AVATARS_STORAGE_KEY, JSON.stringify(avatars));
     } catch (error) {
       console.error('[ChatController] Error saving chat avatar to storage:', error);
     }
@@ -140,7 +140,7 @@ export class ChatController {
           } else {
             formattedTime = apiChat.last_message.time;
           }
-        } catch (e) {
+        } catch {
           formattedTime = apiChat.last_message.time;
         }
       }
@@ -503,7 +503,7 @@ export class ChatController {
           minute: '2-digit'
         });
       }
-    } catch (e) {
+    } catch {
       // Используем исходное время, если не удалось распарсить
     }
 
@@ -589,7 +589,7 @@ export class ChatController {
       this.isLoadingOldMessages = true;
       ChatWebSocket.getOldMessages(0);
       // Сбрасываем флаг через небольшую задержку
-      setTimeout(() => {
+      window.setTimeout(() => {
         this.isLoadingOldMessages = false;
       }, 1000);
       return;
@@ -605,14 +605,14 @@ export class ChatController {
         this.isLoadingOldMessages = true;
         ChatWebSocket.getOldMessages(offset);
         // Сбрасываем флаг через небольшую задержку
-        setTimeout(() => {
+        window.setTimeout(() => {
           this.isLoadingOldMessages = false;
         }, 1000);
       } else {
         // Если id не число, используем 0 (начнем с начала)
         this.isLoadingOldMessages = true;
         ChatWebSocket.getOldMessages(0);
-        setTimeout(() => {
+        window.setTimeout(() => {
           this.isLoadingOldMessages = false;
         }, 1000);
       }
@@ -620,7 +620,7 @@ export class ChatController {
       // Если нет id, используем 0 (начнем с начала)
       this.isLoadingOldMessages = true;
       ChatWebSocket.getOldMessages(0);
-      setTimeout(() => {
+      window.setTimeout(() => {
         this.isLoadingOldMessages = false;
       }, 1000);
     }
@@ -689,16 +689,16 @@ export class ChatController {
       // Сначала ищем пользователя по логину
       const users = await this.searchUsers(userLogin);
       if (users.length === 0) {
-        alert('Пользователь не найден');
+        window.alert('Пользователь не найден');
         return;
       }
       
       // Добавляем первого найденного пользователя
       await this.addUserToChat(chatId, users[0].id);
-      alert('Пользователь успешно добавлен в чат');
+      window.alert('Пользователь успешно добавлен в чат');
     } catch (error) {
       console.error('Error adding user to chat:', error);
-      alert('Ошибка при добавлении пользователя в чат');
+      window.alert('Ошибка при добавлении пользователя в чат');
     }
   };
 
@@ -708,16 +708,16 @@ export class ChatController {
       // Сначала ищем пользователя по логину
       const users = await this.searchUsers(userLogin);
       if (users.length === 0) {
-        alert('Пользователь не найден');
+        window.alert('Пользователь не найден');
         return;
       }
       
       // Удаляем первого найденного пользователя
       await this.removeUserFromChat(chatId, users[0].id);
-      alert('Пользователь успешно удален из чата');
+      window.alert('Пользователь успешно удален из чата');
     } catch (error) {
       console.error('Error removing user from chat:', error);
-      alert('Ошибка при удалении пользователя из чата');
+      window.alert('Ошибка при удалении пользователя из чата');
     }
   };
 }
