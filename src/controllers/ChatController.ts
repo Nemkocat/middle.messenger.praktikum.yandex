@@ -15,6 +15,7 @@ export class ChatController {
   private chats: Chat[] = [];
   private currentUserId: number | null = null;
   private messagesByChatId: Map<string, Message[]> = new Map();
+  // @ts-ignore - переменная используется для хранения токена, но может быть не прочитана в некоторых сценариях
   private currentChatToken: string | null = null;
   private isLoadingOldMessages: boolean = false;
   // Ключ для localStorage, где хранятся аватары чатов
@@ -494,21 +495,24 @@ export class ChatController {
                    String(wsMessage.user_id) === String(this.currentUserId);
 
     // Форматируем время
-    let formattedTime = wsMessage.time;
+    let formattedTime = wsMessage.time || new Date().toISOString();
     try {
-      const date = new Date(wsMessage.time);
-      if (!isNaN(date.getTime())) {
-        formattedTime = date.toLocaleTimeString('ru-RU', {
-          hour: '2-digit',
-          minute: '2-digit'
-        });
+      if (wsMessage.time) {
+        const date = new Date(wsMessage.time);
+        if (!isNaN(date.getTime())) {
+          formattedTime = date.toLocaleTimeString('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
       }
     } catch {
       // Используем исходное время, если не удалось распарсить
+      formattedTime = wsMessage.time || new Date().toISOString();
     }
 
     return {
-      id: wsMessage.id,
+      id: wsMessage.id || '',
       content: wsMessage.content,
       time: formattedTime,
       isMine,

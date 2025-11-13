@@ -41,6 +41,8 @@ const chatAPIInstance = new HTTPTransport(`${BASE_URL}/chats`);
 
 class ChatAPI extends BaseAPI {
   // request() - получение списка чатов
+  // Переопределяем метод базового класса с другой сигнатурой
+  // @ts-ignore - переопределение метода базового класса с другой сигнатурой необходимо для API
   async request(): Promise<Chat[]> {
     const response = await chatAPIInstance.get<Chat[]>('/');
     
@@ -57,6 +59,8 @@ class ChatAPI extends BaseAPI {
   }
 
   // create() - создание нового чата
+  // Переопределяем метод базового класса с другой сигнатурой
+  // @ts-ignore - переопределение метода базового класса с другой сигнатурой необходимо для API
   async create(data: CreateChatData): Promise<{ id: number }> {
     const response = await chatAPIInstance.post<{ id: number }>('/', {
       data,

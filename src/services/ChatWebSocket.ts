@@ -6,7 +6,7 @@
 export interface WSMessage {
   id?: string;
   chat_id?: string;
-  time: string;
+  time?: string;
   type: 'message' | 'file' | 'sticker' | 'get old' | 'ping' | 'pong' | 'user connected';
   user_id?: string;
   content: string;
@@ -29,9 +29,6 @@ class ChatWebSocket {
   private socket: WebSocket | null = null;
   private chatId: string | null = null;
   private pingInterval: number | null = null;
-  private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
-  private reconnectDelay = 3000; // 3 секунды
 
   private messageHandlers: WSMessageHandler[] = [];
   private connectionHandlers: WSConnectionHandler[] = [];
@@ -53,7 +50,6 @@ class ChatWebSocket {
     this.disconnect();
 
     this.chatId = chatId;
-    this.reconnectAttempts = 0;
 
     // Формируем URL для WebSocket согласно документации
     // Формат: wss://ya-praktikum.tech/ws/chats/<USER_ID>/<CHAT_ID>/<TOKEN_VALUE>
@@ -64,7 +60,6 @@ class ChatWebSocket {
       this.socket = new WebSocket(wsUrl);
 
       this.socket.onopen = () => {
-        this.reconnectAttempts = 0;
         this.startPing();
         this.connectionHandlers.forEach(handler => handler());
       };
@@ -156,6 +151,7 @@ class ChatWebSocket {
     const message: WSMessage = {
       type: 'message',
       content,
+      time: new Date().toISOString(),
     };
 
     const messageString = JSON.stringify(message);
@@ -174,6 +170,7 @@ class ChatWebSocket {
     const message: WSMessage = {
       type: 'get old',
       content: String(offset),
+      time: new Date().toISOString(),
     };
 
     this.socket.send(JSON.stringify(message));
@@ -190,6 +187,7 @@ class ChatWebSocket {
     const ping: WSMessage = {
       type: 'ping',
       content: '',
+      time: new Date().toISOString(),
     };
 
     this.socket.send(JSON.stringify(ping));

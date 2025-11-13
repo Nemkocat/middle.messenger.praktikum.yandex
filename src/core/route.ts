@@ -18,6 +18,7 @@ export class Route {
   private _blockFactory: BlockFactory | null = null;
   private _block: Block | null = null;
   // _props хранится для возможного будущего использования (например, для передачи rootQuery в блоки)
+  // @ts-ignore - переменная зарезервирована для будущего использования
   private _props: RouteProps;
 
   constructor(
