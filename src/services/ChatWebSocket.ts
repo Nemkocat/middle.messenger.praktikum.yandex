@@ -1,4 +1,3 @@
-// СГЕНЕРИРОВАНО CURSOR
 /**
  * WebSocket сервис для работы с чатами
  * Документация: https://ya-praktikum.tech/api/v2/openapi/ws
@@ -275,5 +274,3 @@ class ChatWebSocket {
 
 // Экспортируем singleton
 export default new ChatWebSocket();
-// СГЕНЕРИРОВАНО CURSOR
-
