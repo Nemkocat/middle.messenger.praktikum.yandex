@@ -15,7 +15,7 @@ export class ChatController {
   private chats: Chat[] = [];
   private currentUserId: number | null = null;
   private messagesByChatId: Map<string, Message[]> = new Map();
-  // @ts-ignore - переменная используется для хранения токена, но может быть не прочитана в некоторых сценариях
+  // @ts-expect-error - переменная используется для хранения токена, но может быть не прочитана в некоторых сценариях
   private currentChatToken: string | null = null;
   private isLoadingOldMessages: boolean = false;
   // Ключ для localStorage, где хранятся аватары чатов
