@@ -48,14 +48,16 @@ export default class Button extends Block {
     // Если onClick нет и кнопка типа submit, форма обработает submit событие естественным образом
   }
 
-  componentDidUpdate(oldProps: ButtonProps, newProps: ButtonProps): boolean {
+  componentDidUpdate(oldProps: unknown, newProps: unknown): boolean {
+    const oldPropsTyped = oldProps as ButtonProps;
+    const newPropsTyped = newProps as ButtonProps;
     if (!this._element) {
       return false;
     }
 
     // Обновляем атрибут disabled в DOM при изменении props
-    if (oldProps.disabled !== newProps.disabled) {
-      if (newProps.disabled) {
+    if (oldPropsTyped.disabled !== newPropsTyped.disabled) {
+      if (newPropsTyped.disabled) {
         this._element.setAttribute('disabled', '');
       } else {
         this._element.removeAttribute('disabled');
@@ -63,18 +65,18 @@ export default class Button extends Block {
     }
     
     // Обновляем текст кнопки напрямую, если он изменился
-    if (oldProps.text !== newProps.text) {
+    if (oldPropsTyped.text !== newPropsTyped.text) {
       // Очищаем содержимое и устанавливаем новый текст
-      this._element.textContent = newProps.text;
+      this._element.textContent = newPropsTyped.text;
     }
     
     // Обновляем класс, если он изменился
-    if (oldProps.class !== newProps.class) {
-      if (oldProps.class) {
-        this._element.classList.remove(...oldProps.class.split(' ').filter(Boolean));
+    if (oldPropsTyped.class !== newPropsTyped.class) {
+      if (oldPropsTyped.class) {
+        this._element.classList.remove(...oldPropsTyped.class.split(' ').filter(Boolean));
       }
-      if (newProps.class) {
-        this._element.classList.add(...newProps.class.split(' ').filter(Boolean));
+      if (newPropsTyped.class) {
+        this._element.classList.add(...newPropsTyped.class.split(' ').filter(Boolean));
       }
     }
     

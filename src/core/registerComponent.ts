@@ -1,14 +1,15 @@
 import Block from "./block";
 import Handlebars, { HelperOptions } from "handlebars";
 
-type PropsBlock = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-// Используем any здесь, так как props могут содержать любые типы данных
+export type PropsBlock = Record<string, unknown>;
+// Используем unknown вместо any для типобезопасности
 
-interface BlockConstructable<P = PropsBlock> {
-  new (props: P): Block;
+export interface BlockConstructable<P = PropsBlock> {
+  new (props?: P): Block;
 }
 
-export default function registerComponent<Props extends PropsBlock = PropsBlock>(
+// Функция для регистрации компонентов с любыми типами props
+export default function registerComponent<Props extends Record<string, unknown> = PropsBlock>(
   Component: BlockConstructable<Props>,
 ) {
   Handlebars.registerHelper(
@@ -30,13 +31,15 @@ export default function registerComponent<Props extends PropsBlock = PropsBlock>
        * Костыль для того, чтобы передавать переменные
        * внутрь блоков вручную подменяя значение
        */
-      (Object.keys(hash) as any).forEach((key: keyof Props) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-        // Используем any здесь из-за сложности типизации Object.keys с generic типами
-        if (this[key] && typeof this[key] === "string") {
-          hash[key] = hash[key].replace(
+      (Object.keys(hash) as Array<keyof Props>).forEach((key: keyof Props) => {
+        // Используем явное приведение типа для Object.keys с generic типами
+        const value = this[key];
+        const hashValue = hash[key];
+        if (value && typeof value === "string" && typeof hashValue === "string") {
+          hash[key] = hashValue.replace(
             new RegExp(`{{${String(key)}}}`, "i"),
-            this[key],
-          );
+            value,
+          ) as Props[keyof Props];
         }
       });
 

@@ -35,8 +35,8 @@ export default class App {
     // Настройка маршрутов согласно ТЗ
     private setupRoutes() {
         this.router
-            .use("/", LoginPage)                    // / — страница входа
-            .use("/sign-up", RegisterPage)           // /sign-up — страница регистрации
+            .use("/", () => new LoginPage({}))                    // / — страница входа
+            .use("/sign-up", () => new RegisterPage({}))           // /sign-up — страница регистрации
             .use("/messenger", () => {               // /messenger — чат
                 const mainPage = new MainPage({ chatController: this.chatController });
                 this.chatController.setView(mainPage);

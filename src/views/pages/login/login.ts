@@ -6,10 +6,22 @@ import AuthController from "../../../controllers/AuthController";
 import { Validator } from "../../../utils/validation";
 import loginTemplate from "./login.hbs?raw";
 
+interface LoginPageFormState {
+  login: string;
+  password: string;
+}
+
+interface LoginPageErrors {
+  login: string;
+  password: string;
+}
+
 interface LoginPageProps {
   onSubmit?: (e: Event) => void;
   onLoginChange?: (e: Event) => void;
   onPasswordChange?: (e: Event) => void;
+  formState?: LoginPageFormState;
+  errors?: LoginPageErrors;
 }
 
 export default class LoginPage extends Block {
@@ -46,12 +58,15 @@ export default class LoginPage extends Block {
             });
           }
 
+          const currentFormState = (this.props.formState || { login: "", password: "" }) as LoginPageFormState;
+          const currentErrors = (this.props.errors || { login: "", password: "" }) as LoginPageErrors;
+          
           const newFormState = {
-              ...this.props.formState,
+              ...currentFormState,
               login: value
           };
           const newErrors = {
-              ...this.props.errors,
+              ...currentErrors,
               login: validation.isValid ? "" : validation.errorMessage,
           };
 
@@ -75,8 +90,11 @@ export default class LoginPage extends Block {
             });
           }
 
+          const currentFormState = (this.props.formState || { login: "", password: "" }) as LoginPageFormState;
+          const currentErrors = (this.props.errors || { login: "", password: "" }) as LoginPageErrors;
+          
           const newErrors = {
-            ...this.props.errors,
+            ...currentErrors,
             login: validation.isValid ? "" : validation.errorMessage,
           };
 
@@ -85,7 +103,7 @@ export default class LoginPage extends Block {
           });
 
           // Обновляем состояние кнопки отправки
-          this.updateSubmitButton(this.props.formState, newErrors);
+          this.updateSubmitButton(currentFormState as unknown as Record<string, string>, newErrors);
         },
       }),
       PasswordInput: new Input({
@@ -109,12 +127,15 @@ export default class LoginPage extends Block {
             });
           }
 
+          const currentFormState = (this.props.formState || { login: "", password: "" }) as LoginPageFormState;
+          const currentErrors = (this.props.errors || { login: "", password: "" }) as LoginPageErrors;
+          
           const newFormState = {
-              ...this.props.formState,
+              ...currentFormState,
               password: value
           };
           const newErrors = {
-              ...this.props.errors,
+              ...currentErrors,
               password: validation.isValid ? "" : validation.errorMessage,
           };
 
@@ -138,8 +159,11 @@ export default class LoginPage extends Block {
             });
           }
 
+          const currentFormState = (this.props.formState || { login: "", password: "" }) as LoginPageFormState;
+          const currentErrors = (this.props.errors || { login: "", password: "" }) as LoginPageErrors;
+          
           const newErrors = {
-            ...this.props.errors,
+            ...currentErrors,
             password: validation.isValid ? "" : validation.errorMessage,
           };
 
@@ -148,7 +172,7 @@ export default class LoginPage extends Block {
           });
 
           // Обновляем состояние кнопки отправки
-          this.updateSubmitButton(this.props.formState, newErrors);
+          this.updateSubmitButton(currentFormState as unknown as Record<string, string>, newErrors);
         },
       }),
       SubmitButton: new Button({
@@ -217,9 +241,10 @@ export default class LoginPage extends Block {
 
     try {
       // Вызываем контроллер - валидация и навигация внутри контроллера
+      const formState = (this.props.formState || { login: "", password: "" }) as LoginPageFormState;
       const result = await AuthController.signIn({
-        login: this.props.formState.login,
-        password: this.props.formState.password,
+        login: formState.login,
+        password: formState.password,
       });
       
       // Если валидация не прошла, показываем ошибки в UI
@@ -251,9 +276,10 @@ export default class LoginPage extends Block {
       console.error('Login error:', error);
       // Показываем ошибку пользователю
       const errorMessage = error instanceof Error ? error.message : 'Ошибка входа';
+      const currentErrors = (this.props.errors || { login: "", password: "" }) as LoginPageErrors;
       this.setProps({
         errors: {
-          ...this.props.errors,
+          ...currentErrors,
           login: errorMessage,
         }
       });

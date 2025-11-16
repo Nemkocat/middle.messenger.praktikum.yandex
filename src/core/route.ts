@@ -5,7 +5,7 @@ interface RouteProps {
   rootQuery: string;
 }
 
-type BlockConstructor = new (props?: any) => Block; // eslint-disable-line @typescript-eslint/no-explicit-any
+type BlockConstructor = new (props?: Record<string, unknown>) => Block;
 type BlockFactory = () => Block;
 
 function isEqual(lhs: string, rhs: string): boolean {

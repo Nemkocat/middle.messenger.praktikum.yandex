@@ -6,9 +6,31 @@ import AuthController from "../../../controllers/AuthController";
 import { Validator } from "../../../utils/validation";
 import registerTemplate from "./register.hbs?raw";
 
+interface RegisterPageFormState {
+  email: string;
+  login: string;
+  first_name: string;
+  second_name: string;
+  phone: string;
+  password: string;
+  password_repeat: string;
+}
+
+interface RegisterPageErrors {
+  email: string;
+  login: string;
+  first_name: string;
+  second_name: string;
+  phone: string;
+  password: string;
+  password_repeat: string;
+}
+
 interface RegisterPageProps {
   onSubmit?: (e: Event) => void;
   onFieldChange?: (field: string, e: Event) => void;
+  formState?: RegisterPageFormState;
+  errors?: RegisterPageErrors;
 }
 
 export default class RegisterPage extends Block {
@@ -156,7 +178,10 @@ export default class RegisterPage extends Block {
   handleFieldChange(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий Input компонент
     const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
@@ -169,18 +194,21 @@ export default class RegisterPage extends Block {
 
     // Обновляем состояние формы
     const newFormState = {
-      ...this.props.formState,
+      ...currentFormState,
       [fieldName]: value
-    };
+    } as RegisterPageFormState;
 
+    const currentErrors = (this.props.errors || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageErrors;
     const newErrors = {
-      ...this.props.errors,
+      ...currentErrors,
       [fieldName]: validation.isValid ? "" : validation.errorMessage,
-    };
+    } as RegisterPageErrors;
 
     // Если изменился основной пароль, перевалидируем повторный пароль
-    if (fieldName === "password" && this.props.formState.password_repeat) {
-      const passwordRepeatValidation = Validator.validate("password_repeat", this.props.formState.password_repeat, newFormState);
+    if (fieldName === "password" && currentFormState.password_repeat) {
+      const passwordRepeatValidation = Validator.validate("password_repeat", currentFormState.password_repeat, newFormState as unknown as Record<string, string>);
       newErrors.password_repeat = passwordRepeatValidation.isValid ? "" : passwordRepeatValidation.errorMessage;
       
       // Обновляем компонент повторного пароля
@@ -193,8 +221,8 @@ export default class RegisterPage extends Block {
     }
 
     // Если изменился повторный пароль, перевалидируем основной пароль
-    if (fieldName === "password_repeat" && this.props.formState.password) {
-      const passwordValidation = Validator.validate("password", this.props.formState.password, newFormState);
+    if (fieldName === "password_repeat" && currentFormState.password) {
+      const passwordValidation = Validator.validate("password", currentFormState.password, newFormState as unknown as Record<string, string>);
       newErrors.password = passwordValidation.isValid ? "" : passwordValidation.errorMessage;
       
       // Обновляем компонент основного пароля
@@ -212,13 +240,16 @@ export default class RegisterPage extends Block {
     });
 
     // Обновляем состояние кнопки отправки
-    this.updateSubmitButton(newFormState, newErrors);
+    this.updateSubmitButton(newFormState as unknown as Record<string, string>, newErrors as unknown as Record<string, string>);
   }
 
   handleFieldBlur(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий Input компонент
     const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
@@ -228,17 +259,20 @@ export default class RegisterPage extends Block {
       });
     }
 
+    const currentErrors = (this.props.errors || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageErrors;
     const newErrors = {
-      ...this.props.errors,
+      ...currentErrors,
       [fieldName]: validation.isValid ? "" : validation.errorMessage,
-    };
+    } as RegisterPageErrors;
 
     this.setProps({
       errors: newErrors
     });
 
     // Обновляем состояние кнопки отправки
-    this.updateSubmitButton(this.props.formState, newErrors);
+    this.updateSubmitButton(currentFormState as unknown as Record<string, string>, newErrors as unknown as Record<string, string>);
   }
 
   private isSubmitting: boolean = false;
@@ -265,14 +299,17 @@ export default class RegisterPage extends Block {
 
     try {
       // Вызываем контроллер - валидация и навигация внутри контроллера
+      const formState = (this.props.formState || {
+        email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+      }) as RegisterPageFormState;
       const result = await AuthController.signUp({
-        first_name: this.props.formState.first_name,
-        second_name: this.props.formState.second_name,
-        login: this.props.formState.login,
-        email: this.props.formState.email,
-        password: this.props.formState.password,
-        phone: this.props.formState.phone,
-        password_repeat: this.props.formState.password_repeat,
+        first_name: formState.first_name,
+        second_name: formState.second_name,
+        login: formState.login,
+        email: formState.email,
+        password: formState.password,
+        phone: formState.phone,
+        password_repeat: formState.password_repeat,
       });
       
       // Если валидация не прошла, показываем ошибки в UI
@@ -309,9 +346,13 @@ export default class RegisterPage extends Block {
       const isLoginError = errorMessage.toLowerCase().includes('login') || 
                           errorMessage.toLowerCase().includes('логин');
       
+      const currentErrors = (this.props.errors || {
+        email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+      }) as RegisterPageErrors;
+      
       this.setProps({
         errors: {
-          ...this.props.errors,
+          ...currentErrors,
           [isLoginError ? 'login' : 'email']: errorMessage,
         }
       });

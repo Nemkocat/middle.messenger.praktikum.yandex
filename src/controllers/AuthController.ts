@@ -62,27 +62,47 @@ class AuthController {
       return { isValid: false, errors };
     }
 
-    await AuthAPI.signUp({
-      first_name: data.first_name,
-      second_name: data.second_name,
-      login: data.login,
-      email: data.email,
-      password: data.password,
-      phone: data.phone,
-    });
-    
-    // После успешной регистрации проверяем, авторизован ли пользователь
-    // После регистрации API может автоматически авторизовать пользователя
-    const user = await AuthAPI.getUser();
-    this.currentUser = user;
-    
-    // Навигация в контроллере через window.router
-    const router = this.getRouter();
-    if (router) {
-      router.go('/messenger');
+    try {
+      await AuthAPI.signUp({
+        first_name: data.first_name,
+        second_name: data.second_name,
+        login: data.login,
+        email: data.email,
+        password: data.password,
+        phone: data.phone,
+      });
+      
+      // После успешной регистрации проверяем, авторизован ли пользователь
+      // После регистрации API может автоматически авторизовать пользователя
+      const user = await AuthAPI.getUser();
+      this.currentUser = user;
+      
+      // Навигация в контроллере через window.router
+      const router = this.getRouter();
+      if (router) {
+        router.go('/messenger');
+      }
+      
+      return { isValid: true };
+    } catch (error) {
+      console.error('[AuthController] signUp error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка регистрации';
+      
+      // Пытаемся определить, какое поле вызвало ошибку
+      const errorLower = errorMessage.toLowerCase();
+      if (errorLower.includes('логин') || errorLower.includes('login')) {
+        errors.login = errorMessage;
+      } else if (errorLower.includes('email') || errorLower.includes('почт')) {
+        errors.email = errorMessage;
+      } else if (errorLower.includes('телефон') || errorLower.includes('phone')) {
+        errors.phone = errorMessage;
+      } else {
+        // Если не удалось определить поле, показываем ошибку на email
+        errors.email = errorMessage;
+      }
+      
+      return { isValid: false, errors };
     }
-    
-    return { isValid: true };
   }
 
   async signIn(data: { login: string; password: string }): Promise<{ isValid: boolean; errors?: Record<string, string> }> {
@@ -107,18 +127,36 @@ class AuthController {
       return { isValid: false, errors };
     }
 
-    await AuthAPI.signIn(data);
-    // Получаем данные пользователя после успешного входа
-    const user = await AuthAPI.getUser();
-    this.currentUser = user;
-    
-    // Навигация в контроллере через window.router
-    const router = this.getRouter();
-    if (router) {
-      router.go('/messenger');
+    try {
+      await AuthAPI.signIn(data);
+      // Получаем данные пользователя после успешного входа
+      const user = await AuthAPI.getUser();
+      this.currentUser = user;
+      
+      // Навигация в контроллере через window.router
+      const router = this.getRouter();
+      if (router) {
+        router.go('/messenger');
+      }
+      
+      return { isValid: true };
+    } catch (error) {
+      console.error('[AuthController] signIn error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка входа';
+      
+      // Определяем, какое поле вызвало ошибку
+      const errorLower = errorMessage.toLowerCase();
+      if (errorLower.includes('логин') || errorLower.includes('login')) {
+        errors.login = errorMessage;
+      } else if (errorLower.includes('пароль') || errorLower.includes('password')) {
+        errors.password = errorMessage;
+      } else {
+        // Если не удалось определить поле, показываем ошибку на логин
+        errors.login = errorMessage;
+      }
+      
+      return { isValid: false, errors };
     }
-    
-    return { isValid: true };
   }
 
   async logout(): Promise<void> {

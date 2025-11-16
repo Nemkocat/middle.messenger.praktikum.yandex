@@ -54,7 +54,7 @@ export default class Avatar extends Block {
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         
-        if (file && this.props.onChange) {
+        if (file && this.props.onChange && typeof this.props.onChange === 'function') {
           // Показываем предпросмотр изображения перед загрузкой
           this.showPreview(file);
           this.props.onChange(e);
@@ -85,6 +85,8 @@ export default class Avatar extends Block {
   render(): string {
     const isLoading = this.props.isLoading || false;
     const imgSrc = this.props.img || '';
+    const imgClass = this.props.imgClass || '';
+    const loadingClass = isLoading ? 'profile__avatar_img--loading' : '';
     
     return `
       <div class="avatar-upload__wrapper">
@@ -92,7 +94,6 @@ export default class Avatar extends Block {
           <input type="file" 
             accept="image/*" 
             name="${this.props.name || 'avatar'}" 
-            style="display: none;"
             class="avatar-upload__input"
             ${isLoading ? 'disabled' : ''}> 
 
@@ -104,7 +105,7 @@ export default class Avatar extends Block {
           ` : ''}
           
           ${imgSrc ? `
-            <img src="${imgSrc}" class="${this.props.imgClass || ''}" alt="${this.props.imgAlt || 'Аватар'}" ${isLoading ? 'style="opacity: 0.5;"' : ''}>
+            <img src="${imgSrc}" class="${imgClass} ${loadingClass}" alt="${this.props.imgAlt || 'Аватар'}">
           ` : `
             <span class="avatar-upload__text">${this.props.text || ''}</span>
           `}

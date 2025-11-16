@@ -7,7 +7,26 @@ import { Validator } from "../../../utils/validation";
 import AuthController from "../../../controllers/AuthController";
 import UserAPI from "../../../services/UserAPI";
 import { Router } from "../../../core/router";
+import { RESOURCES_BASE_URL } from "../../../config";
 import editProfileTemplate from "./editProfile.hbs?raw";
+
+interface EditProfileFormState {
+  email: string;
+  login: string;
+  first_name: string;
+  second_name: string;
+  display_name: string;
+  phone: string;
+}
+
+interface EditProfileErrors {
+  email: string;
+  login: string;
+  first_name: string;
+  second_name: string;
+  display_name: string;
+  phone: string;
+}
 
 export default class EditProfilePage extends Block {
   constructor(props: object = {}) {
@@ -34,7 +53,7 @@ export default class EditProfilePage extends Block {
         class: "profile__avatar",
         name: "avatar",
         img: user?.avatar 
-          ? `https://ya-praktikum.tech/api/v2/resources${user.avatar}` 
+          ? `${RESOURCES_BASE_URL}${user.avatar}` 
           : "/images/default-avatar.png",
         imgClass: "profile__avatar_img",
         imgAlt: "Аватар",
@@ -61,7 +80,7 @@ export default class EditProfilePage extends Block {
             // Обновляем аватар в компоненте
             if (avatarComponent && !Array.isArray(avatarComponent)) {
               const newAvatarUrl = updatedUser.avatar 
-                    ? `https://ya-praktikum.tech/api/v2/resources${updatedUser.avatar}` 
+                    ? `${RESOURCES_BASE_URL}${updatedUser.avatar}` 
                 : "/images/default-avatar.png";
               
               avatarComponent.setProps({
@@ -189,7 +208,10 @@ export default class EditProfilePage extends Block {
   handleFieldChange(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+    }) as EditProfileFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий ProfileDataItem компонент
     const componentName = fieldName === "display_name" ? "DisplayNameItem" : `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`;
@@ -201,22 +223,29 @@ export default class EditProfilePage extends Block {
       });
     }
 
+    const currentErrors = (this.props.errors || {
+      email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+    }) as EditProfileErrors;
+
     this.setProps({
       formState: {
-        ...this.props.formState,
+        ...currentFormState,
         [fieldName]: value
-      },
+      } as EditProfileFormState,
       errors: {
-        ...this.props.errors,
+        ...currentErrors,
         [fieldName]: validation.isValid ? "" : validation.errorMessage,
-      }
+      } as EditProfileErrors
     });
   }
 
   handleFieldBlur(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+    }) as EditProfileFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий ProfileDataItem компонент
     const componentName = fieldName === "display_name" ? "DisplayNameItem" : `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Item`;
@@ -227,11 +256,15 @@ export default class EditProfilePage extends Block {
       });
     }
 
+    const currentErrors = (this.props.errors || {
+      email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+    }) as EditProfileErrors;
+
     this.setProps({
       errors: {
-        ...this.props.errors,
+        ...currentErrors,
         [fieldName]: validation.isValid ? "" : validation.errorMessage,
-      }
+      } as EditProfileErrors
     });
   }
 
@@ -240,13 +273,16 @@ export default class EditProfilePage extends Block {
     e.stopPropagation();
     
     // Валидация всех полей при submit
+    const formState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+    }) as EditProfileFormState;
     const fields = ['email', 'login', 'first_name', 'second_name', 'display_name', 'phone'];
     let hasErrors = false;
     const newErrors: Record<string, string> = {};
 
     fields.forEach(fieldName => {
-      const value = this.props.formState[fieldName];
-      const validation = Validator.validate(fieldName, value, this.props.formState);
+      const value = formState[fieldName as keyof EditProfileFormState];
+      const validation = Validator.validate(fieldName, value, formState as unknown as Record<string, string>);
       
       if (!validation.isValid) {
         hasErrors = true;
@@ -275,13 +311,16 @@ export default class EditProfilePage extends Block {
     }
 
     // Если валидация прошла успешно
+    const currentFormState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+    }) as EditProfileFormState;
     const updateData = {
-      first_name: this.props.formState.first_name,
-      second_name: this.props.formState.second_name,
-      display_name: this.props.formState.display_name,
-      login: this.props.formState.login,
-      email: this.props.formState.email,
-      phone: this.props.formState.phone,
+      first_name: currentFormState.first_name,
+      second_name: currentFormState.second_name,
+      display_name: currentFormState.display_name,
+      login: currentFormState.login,
+      email: currentFormState.email,
+      phone: currentFormState.phone,
     };
     
     try {
@@ -317,8 +356,11 @@ export default class EditProfilePage extends Block {
         // и показываем ошибку на том поле, которое могло вызвать конфликт
         const originalUser = AuthController.getUser();
         if (originalUser) {
-          const loginChanged = this.props.formState.login !== originalUser.login;
-          const emailChanged = this.props.formState.email !== originalUser.email;
+          const currentFormStateForError = (this.props.formState || {
+            email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+          }) as EditProfileFormState;
+          const loginChanged = currentFormStateForError.login !== originalUser.login;
+          const emailChanged = currentFormStateForError.email !== originalUser.email;
           
           // Если оба изменились, показываем на email (более вероятный конфликт)
           if (loginChanged && emailChanged) {
@@ -339,11 +381,15 @@ export default class EditProfilePage extends Block {
         errorMessage = 'Пользователь с таким логином или email уже существует. Пожалуйста, используйте другие значения.';
       }
       
+      const currentErrors = (this.props.errors || {
+        email: "", login: "", first_name: "", second_name: "", display_name: "", phone: ""
+      }) as EditProfileErrors;
+      
       this.setProps({
         errors: {
-          ...this.props.errors,
+          ...currentErrors,
           [errorField]: errorMessage,
-        }
+        } as EditProfileErrors
       });
       
       // Обновляем соответствующий компонент

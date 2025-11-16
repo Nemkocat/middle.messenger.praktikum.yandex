@@ -6,6 +6,7 @@ import UserAPI, { User } from '../services/UserAPI';
 import AuthAPI from '../services/AuthAPI';
 import ChatWebSocket, { WSMessage } from '../services/ChatWebSocket';
 import Block from '../core/block';
+import { RESOURCES_BASE_URL } from '../config';
 
 export class ChatController {
   private static instance: ChatController | null = null;
@@ -659,7 +660,7 @@ export class ChatController {
       
       // Сохраняем аватар пользователя для этого чата в localStorage
       if (user.avatar) {
-        const avatarUrl = `https://ya-praktikum.tech/api/v2/resources${user.avatar}`;
+        const avatarUrl = `${RESOURCES_BASE_URL}${user.avatar}`;
         this.saveChatAvatarToStorage(String(chatResult.id), avatarUrl);
       }
       

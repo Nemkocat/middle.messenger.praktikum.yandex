@@ -3,13 +3,14 @@ import Avatar from "../../components/Avatar";
 import ProfileDataItem from "../../components/ProfileDataItem";
 import Link from "../../components/Link";
 import AuthController from "../../../controllers/AuthController";
+import { RESOURCES_BASE_URL } from "../../../config";
 import profileTemplate from "./profile.hbs?raw";
 
 export default class ProfilePage extends Block {
   constructor(props: object = {}) {
     const user = AuthController.getUser();
     const avatarUrl = user?.avatar 
-      ? `https://ya-praktikum.tech/api/v2/resources${user.avatar}` 
+      ? `${RESOURCES_BASE_URL}${user.avatar}` 
       : "/images/default-avatar.png";
     
     super("div", {

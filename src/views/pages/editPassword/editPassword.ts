@@ -7,6 +7,18 @@ import UserAPI from "../../../services/UserAPI";
 import { Router } from "../../../core/router";
 import editPasswordTemplate from "./editPassword.hbs?raw";
 
+interface EditPasswordFormState {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+interface EditPasswordErrors {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export default class EditPasswordPage extends Block {
   constructor(props: object = {}) {
     super("div", {
@@ -79,7 +91,10 @@ export default class EditPasswordPage extends Block {
   handleFieldChange(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      oldPassword: "", newPassword: "", confirmPassword: ""
+    }) as EditPasswordFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий ProfileDataItem компонент
     const componentName = this.getComponentName(fieldName);
@@ -93,18 +108,21 @@ export default class EditPasswordPage extends Block {
 
     // Обновляем состояние формы
     const newFormState = {
-      ...this.props.formState,
+      ...currentFormState,
       [fieldName]: value
-    };
+    } as EditPasswordFormState;
 
+    const currentErrors = (this.props.errors || {
+      oldPassword: "", newPassword: "", confirmPassword: ""
+    }) as EditPasswordErrors;
     const newErrors = {
-      ...this.props.errors,
+      ...currentErrors,
       [fieldName]: validation.isValid ? "" : validation.errorMessage,
-    };
+    } as EditPasswordErrors;
 
     // Если изменился новый пароль, перевалидируем подтверждение пароля
-    if (fieldName === "newPassword" && this.props.formState.confirmPassword) {
-      const confirmPasswordValidation = Validator.validate("confirmPassword", this.props.formState.confirmPassword, newFormState);
+    if (fieldName === "newPassword" && currentFormState.confirmPassword) {
+      const confirmPasswordValidation = Validator.validate("confirmPassword", currentFormState.confirmPassword, newFormState as unknown as Record<string, string>);
       newErrors.confirmPassword = confirmPasswordValidation.isValid ? "" : confirmPasswordValidation.errorMessage;
       
       // Обновляем компонент подтверждения пароля
@@ -117,8 +135,8 @@ export default class EditPasswordPage extends Block {
     }
 
     // Если изменилось подтверждение пароля, перевалидируем новый пароль
-    if (fieldName === "confirmPassword" && this.props.formState.newPassword) {
-      const newPasswordValidation = Validator.validate("newPassword", this.props.formState.newPassword, newFormState);
+    if (fieldName === "confirmPassword" && currentFormState.newPassword) {
+      const newPasswordValidation = Validator.validate("newPassword", currentFormState.newPassword, newFormState as unknown as Record<string, string>);
       newErrors.newPassword = newPasswordValidation.isValid ? "" : newPasswordValidation.errorMessage;
       
       // Обновляем компонент нового пароля
@@ -139,7 +157,10 @@ export default class EditPasswordPage extends Block {
   handleFieldBlur(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      oldPassword: "", newPassword: "", confirmPassword: ""
+    }) as EditPasswordFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий ProfileDataItem компонент
     const componentName = this.getComponentName(fieldName);
@@ -150,11 +171,15 @@ export default class EditPasswordPage extends Block {
       });
     }
 
+    const currentErrors = (this.props.errors || {
+      oldPassword: "", newPassword: "", confirmPassword: ""
+    }) as EditPasswordErrors;
+
     this.setProps({
       errors: {
-        ...this.props.errors,
+        ...currentErrors,
         [fieldName]: validation.isValid ? "" : validation.errorMessage,
-      }
+      } as EditPasswordErrors
     });
   }
 
@@ -163,13 +188,16 @@ export default class EditPasswordPage extends Block {
     e.stopPropagation();
     
     // Валидация всех полей при submit
+    const formState = (this.props.formState || {
+      oldPassword: "", newPassword: "", confirmPassword: ""
+    }) as EditPasswordFormState;
     const fields = ['oldPassword', 'newPassword', 'confirmPassword'];
     let hasErrors = false;
     const newErrors: Record<string, string> = {};
 
     fields.forEach(fieldName => {
-      const value = this.props.formState[fieldName];
-      const validation = Validator.validate(fieldName, value, this.props.formState);
+      const value = formState[fieldName as keyof EditPasswordFormState];
+      const validation = Validator.validate(fieldName, value, formState as unknown as Record<string, string>);
       
       if (!validation.isValid) {
         hasErrors = true;
@@ -198,10 +226,13 @@ export default class EditPasswordPage extends Block {
     }
 
     // Если валидация прошла успешно
+    const currentFormState = (this.props.formState || {
+      oldPassword: "", newPassword: "", confirmPassword: ""
+    }) as EditPasswordFormState;
     try {
       await UserAPI.updatePassword({
-        oldPassword: this.props.formState.oldPassword,
-        newPassword: this.props.formState.newPassword,
+        oldPassword: currentFormState.oldPassword,
+        newPassword: currentFormState.newPassword,
       });
       
       // Перенаправляем на страницу профиля
@@ -225,11 +256,15 @@ export default class EditPasswordPage extends Block {
         errorField = 'oldPassword';
       }
       
+      const currentErrors = (this.props.errors || {
+        oldPassword: "", newPassword: "", confirmPassword: ""
+      }) as EditPasswordErrors;
+      
       this.setProps({
         errors: {
-          ...this.props.errors,
+          ...currentErrors,
           [errorField]: errorMessage,
-        }
+        } as EditPasswordErrors
       });
       
       // Обновляем соответствующий компонент

@@ -3,6 +3,8 @@
  * Документация: https://ya-praktikum.tech/api/v2/openapi/ws
  */
 
+import { WS_BASE_URL } from '../config';
+
 export interface WSMessage {
   id?: string;
   chat_id?: string;
@@ -54,7 +56,7 @@ class ChatWebSocket {
     // Формируем URL для WebSocket согласно документации
     // Формат: wss://ya-praktikum.tech/ws/chats/<USER_ID>/<CHAT_ID>/<TOKEN_VALUE>
     // Cookie передаются автоматически браузером при WebSocket подключении
-    const wsUrl = `wss://ya-praktikum.tech/ws/chats/${userId}/${chatId}/${token}`;
+    const wsUrl = `${WS_BASE_URL}/ws/chats/${userId}/${chatId}/${token}`;
 
     try {
       this.socket = new WebSocket(wsUrl);

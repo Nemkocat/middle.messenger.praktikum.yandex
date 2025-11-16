@@ -1,3 +1,5 @@
+import { HTTPMethod } from './httpMethods';
+
 export interface HTTPTransportOptions {
   timeout?: number;
   headers?: Record<string, string>;
@@ -18,7 +20,7 @@ export default class HTTPTransport {
   }
 
   private createRequest<T = unknown>(
-    method: string,
+    method: HTTPMethod,
     url: string,
     options: HTTPTransportOptions = {}
   ): Promise<HTTPTransportResponse<T>> {
@@ -33,7 +35,7 @@ export default class HTTPTransport {
 
       // Обработка query string для GET запросов
       let requestUrl = fullUrl;
-      if (method === 'GET' && options.data && typeof options.data === 'object' && options.data !== null) {
+      if (method === HTTPMethod.GET && options.data && typeof options.data === 'object' && options.data !== null) {
         const queryString = this.buildQueryString(options.data as Record<string, unknown>);
         requestUrl += (fullUrl.includes('?') ? '&' : '?') + queryString;
       }
@@ -107,7 +109,7 @@ export default class HTTPTransport {
       };
 
       // Отправка данных для POST, PUT, DELETE
-      if (method !== 'GET' && options.data) {
+      if (method !== HTTPMethod.GET && options.data) {
         if (options.headers?.['Content-Type'] === 'application/json') {
           xhr.send(JSON.stringify(options.data));
         } else if (typeof options.data === 'string' || options.data instanceof FormData || options.data instanceof Blob) {
@@ -134,13 +136,13 @@ export default class HTTPTransport {
   }
 
   get<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest<T>('GET', url, options);
+    return this.createRequest<T>(HTTPMethod.GET, url, options);
   }
 
   post<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
     // Если данные - FormData, не устанавливаем Content-Type (браузер установит автоматически)
     const isFormData = options.data instanceof FormData;
-    return this.createRequest<T>('POST', url, {
+    return this.createRequest<T>(HTTPMethod.POST, url, {
       ...options,
       headers: isFormData
         ? options.headers
@@ -154,7 +156,7 @@ export default class HTTPTransport {
   put<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
     // Если данные - FormData, НЕ передаем НИКАКИЕ заголовки, чтобы избежать CORS preflight
     const isFormData = options.data instanceof FormData;
-    return this.createRequest<T>('PUT', url, {
+    return this.createRequest<T>(HTTPMethod.PUT, url, {
       ...options,
       headers: isFormData
         ? undefined // Для FormData не передаем заголовки вообще
@@ -168,7 +170,7 @@ export default class HTTPTransport {
   delete<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
     // Если данные - FormData, не устанавливаем Content-Type (браузер установит автоматически)
     const isFormData = options.data instanceof FormData;
-    return this.createRequest<T>('DELETE', url, {
+    return this.createRequest<T>(HTTPMethod.DELETE, url, {
       ...options,
       headers: isFormData
         ? options.headers

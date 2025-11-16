@@ -1,7 +1,8 @@
 import HTTPTransport from '../core/HTTPTransport';
 import { BaseAPI } from '../core/http/BaseAPI';
+import { API_BASE_URL } from '../config';
 
-const BASE_URL = 'https://ya-praktikum.tech/api/v2';
+const BASE_URL = API_BASE_URL;
 
 export interface Chat {
   id: number;

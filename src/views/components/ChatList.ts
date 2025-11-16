@@ -28,7 +28,7 @@ export default class ChatList extends Block {
           const chatCard = target.closest('.chat-card') as HTMLElement;
           if (chatCard) {
             // Используем текущие props, а не props из конструктора
-            const currentProps = this.props as ChatListProps;
+            const currentProps = this.props as unknown as ChatListProps;
             if (currentProps.onChatClick) {
               const chatId = chatCard.getAttribute('data-chat-id');
               const chat = currentProps.chats?.find(c => c.id === chatId);
@@ -42,10 +42,12 @@ export default class ChatList extends Block {
     });
   }
 
-  componentDidUpdate(oldProps: ChatListProps, newProps: ChatListProps): boolean {
+  componentDidUpdate(oldProps: unknown, newProps: unknown): boolean {
+    const oldPropsTyped = oldProps as ChatListProps;
+    const newPropsTyped = newProps as ChatListProps;
     // Если изменился список чатов, перерисовываем компонент
-    const chatsChanged = oldProps.chats !== newProps.chats;
-    const lengthChanged = oldProps.chats?.length !== newProps.chats?.length;
+    const chatsChanged = oldPropsTyped.chats !== newPropsTyped.chats;
+    const lengthChanged = oldPropsTyped.chats?.length !== newPropsTyped.chats?.length;
     
     if (chatsChanged || lengthChanged) {
       // При обновлении нужно перепривязать обработчики ошибок для новых изображений

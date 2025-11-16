@@ -53,13 +53,16 @@ export default class Modal extends Block {
       const value = target.value;
       const validation = Validator.validate("login", value);
       
+      const currentFormState = (this.props.formState || { login: "" }) as ModalProps['formState'];
+      const currentErrors = (this.props.errors || { login: "" }) as ModalProps['errors'];
+      
       this.setProps({
         formState: {
-          ...this.props.formState,
+          ...currentFormState,
           login: value,
         },
         errors: {
-          ...this.props.errors,
+          ...currentErrors,
           login: validation.isValid ? "" : validation.errorMessage,
         },
       });
@@ -71,11 +74,11 @@ export default class Modal extends Block {
     
     // Если форма не нужна (например, для удаления чата), просто вызываем onSubmit
     if (this.props.showForm === false) {
-      if (this.props.onSubmit) {
+      if (this.props.onSubmit && typeof this.props.onSubmit === 'function') {
         try {
           await this.props.onSubmit();
           // Закрываем модальное окно
-          if (this.props.onClose) {
+          if (this.props.onClose && typeof this.props.onClose === 'function') {
             this.props.onClose();
           }
         } catch (error) {
@@ -89,13 +92,15 @@ export default class Modal extends Block {
     }
     
     // Обычная форма с валидацией логина
-    const login = this.props.formState?.login || "";
+    const formState = (this.props.formState || { login: "" }) as ModalProps['formState'];
+    const login = formState?.login || "";
     const validation = Validator.validate("login", login);
     
     if (!validation.isValid) {
+      const currentErrors = (this.props.errors || { login: "" }) as ModalProps['errors'];
       this.setProps({
         errors: {
-          ...this.props.errors,
+          ...currentErrors,
           login: validation.errorMessage,
         },
       });
@@ -103,7 +108,7 @@ export default class Modal extends Block {
     }
 
     // Если есть обработчик onSubmit, вызываем его
-    if (this.props.onSubmit) {
+    if (this.props.onSubmit && typeof this.props.onSubmit === 'function') {
       try {
         await this.props.onSubmit(login.trim());
         // Очищаем форму после успешной отправки
@@ -116,15 +121,16 @@ export default class Modal extends Block {
           },
         });
         // Закрываем модальное окно
-        if (this.props.onClose) {
+        if (this.props.onClose && typeof this.props.onClose === 'function') {
           this.props.onClose();
         }
       } catch (error) {
         console.error('Error submitting form:', error);
         const errorMessage = error instanceof Error ? error.message : 'Ошибка при создании чата';
+        const currentErrors = (this.props.errors || { login: "" }) as ModalProps['errors'];
         this.setProps({
           errors: {
-            ...this.props.errors,
+            ...currentErrors,
             login: errorMessage,
           },
         });
@@ -202,8 +208,8 @@ export default class Modal extends Block {
 
     // Если форма не нужна, показываем только кнопку
     if (this.props.showForm === false) {
-      const buttonText = escapeHtml(this.props.buttonText || "Удалить");
-      const title = escapeHtml(this.props.title || "");
+      const buttonText = escapeHtml(String(this.props.buttonText || "Удалить"));
+      const title = escapeHtml(String(this.props.title || ""));
       return `
         <div class="modal__backdrop"></div>
         <div class="modal__content">
@@ -216,10 +222,12 @@ export default class Modal extends Block {
     }
 
     // Обычная форма с полем ввода
-    const loginValue = escapeHtml(this.props.formState?.login || "");
-    const loginError = escapeHtml(this.props.errors?.login || "");
-    const buttonText = escapeHtml(this.props.buttonText || "Добавить");
-    const title = escapeHtml(this.props.title || "");
+    const formState = (this.props.formState || { login: "" }) as ModalProps['formState'];
+    const errors = (this.props.errors || { login: "" }) as ModalProps['errors'];
+    const loginValue = escapeHtml(String(formState?.login || ""));
+    const loginError = escapeHtml(String(errors?.login || ""));
+    const buttonText = escapeHtml(String(this.props.buttonText || "Добавить"));
+    const title = escapeHtml(String(this.props.title || ""));
 
     return `
       <div class="modal__backdrop"></div>
