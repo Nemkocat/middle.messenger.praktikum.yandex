@@ -4,6 +4,12 @@
     "es2021": true,
     "node": true
   },
+  "globals": {
+    "localStorage": "readonly",
+    "setTimeout": "readonly",
+    "clearInterval": "readonly",
+    "alert": "readonly"
+  },
   "extends": [
     "eslint:recommended",
     "@typescript-eslint/recommended"

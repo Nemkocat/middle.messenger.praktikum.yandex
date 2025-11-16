@@ -1,3 +1,5 @@
+import { HTTPMethod } from './httpMethods';
+
 export interface HTTPTransportOptions {
   timeout?: number;
   headers?: Record<string, string>;
@@ -18,7 +20,7 @@ export default class HTTPTransport {
   }
 
   private createRequest<T = unknown>(
-    method: string,
+    method: HTTPMethod,
     url: string,
     options: HTTPTransportOptions = {}
   ): Promise<HTTPTransportResponse<T>> {
@@ -33,15 +35,24 @@ export default class HTTPTransport {
 
       // Обработка query string для GET запросов
       let requestUrl = fullUrl;
-      if (method === 'GET' && options.data && typeof options.data === 'object' && options.data !== null) {
+      if (method === HTTPMethod.GET && options.data && typeof options.data === 'object' && options.data !== null) {
         const queryString = this.buildQueryString(options.data as Record<string, unknown>);
         requestUrl += (fullUrl.includes('?') ? '&' : '?') + queryString;
       }
 
       xhr.open(method, requestUrl, true);
+      
+      // Включаем отправку cookies для авторизации
+      xhr.withCredentials = true;
 
       // Установка заголовков
-      if (options.headers) {
+      // Для FormData НЕ устанавливаем Content-Type - браузер установит его сам с boundary
+      // Также НЕ устанавливаем никакие другие заголовки для FormData, чтобы избежать preflight запроса
+      const isFormData = options.data instanceof FormData;
+      
+      // Для FormData не устанавливаем НИКАКИЕ заголовки вручную
+      // Браузер сам установит Content-Type с boundary, и это не вызовет preflight
+      if (options.headers && !isFormData) {
         Object.entries(options.headers).forEach(([key, value]) => {
           xhr.setRequestHeader(key, value);
         });
@@ -51,10 +62,18 @@ export default class HTTPTransport {
       xhr.onload = () => {
         let responseData: unknown;
         try {
-          responseData = JSON.parse(xhr.responseText);
+          // Пытаемся распарсить JSON, даже если статус не 200
+          const text = xhr.responseText || '';
+          if (text.trim()) {
+            responseData = JSON.parse(text);
+          } else {
+            responseData = null;
+          }
         } catch {
-          responseData = xhr.responseText;
+          // Если не JSON, возвращаем текст как есть
+          responseData = xhr.responseText || null;
         }
+
 
         resolve({
           status: xhr.status,
@@ -64,7 +83,25 @@ export default class HTTPTransport {
       };
 
       xhr.onerror = () => {
-        reject(new Error(`Network error: ${xhr.statusText}`));
+        // Проверяем, не является ли это CORS ошибкой
+        const errorMessage = xhr.statusText || 'Network error';
+        let detailedError = `Network error: ${errorMessage}`;
+        
+        // Если статус 0 и нет ответа, это может быть CORS ошибка
+        if (xhr.status === 0 && !xhr.responseText) {
+          detailedError = 'CORS error: Запрос заблокирован политикой CORS. Проверьте настройки сервера и убедитесь, что запрос отправляется с правильными заголовками.';
+        }
+        
+        console.error(`[HTTPTransport] Request error:`, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          readyState: xhr.readyState,
+          method,
+          url: requestUrl,
+          isFormData: options.data instanceof FormData,
+        });
+        
+        reject(new Error(detailedError));
       };
 
       xhr.ontimeout = () => {
@@ -72,7 +109,7 @@ export default class HTTPTransport {
       };
 
       // Отправка данных для POST, PUT, DELETE
-      if (method !== 'GET' && options.data) {
+      if (method !== HTTPMethod.GET && options.data) {
         if (options.headers?.['Content-Type'] === 'application/json') {
           xhr.send(JSON.stringify(options.data));
         } else if (typeof options.data === 'string' || options.data instanceof FormData || options.data instanceof Blob) {
@@ -99,31 +136,52 @@ export default class HTTPTransport {
   }
 
   get<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest<T>('GET', url, options);
+    return this.createRequest<T>(HTTPMethod.GET, url, options);
   }
 
   post<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest<T>('POST', url, {
+    // Если данные - FormData, не устанавливаем Content-Type (браузер установит автоматически)
+    const isFormData = options.data instanceof FormData;
+    return this.createRequest<T>(HTTPMethod.POST, url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: isFormData
+        ? options.headers
+        : {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
     });
   }
 
   put<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest<T>('PUT', url, {
+    // Если данные - FormData, НЕ передаем НИКАКИЕ заголовки, чтобы избежать CORS preflight
+    const isFormData = options.data instanceof FormData;
+    return this.createRequest<T>(HTTPMethod.PUT, url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: isFormData
+        ? undefined // Для FormData не передаем заголовки вообще
+        : {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
     });
   }
 
   delete<T = unknown>(url: string, options: HTTPTransportOptions = {}): Promise<HTTPTransportResponse<T>> {
-    return this.createRequest<T>('DELETE', url, options);
+    // Если данные - FormData, не устанавливаем Content-Type (браузер установит автоматически)
+    const isFormData = options.data instanceof FormData;
+    return this.createRequest<T>(HTTPMethod.DELETE, url, {
+      ...options,
+      headers: isFormData
+        ? options.headers
+        : options.data
+          ? {
+              'Content-Type': 'application/json',
+              ...options.headers,
+            }
+          : options.headers,
+    });
   }
 }
+
 

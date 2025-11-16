@@ -14,6 +14,9 @@ interface ChatListProps {
   onChatClick?: (chat: Chat) => void;
 }
 
+// WeakMap для хранения флагов обработчиков ошибок изображений
+const errorHandlerMap = new WeakMap<HTMLImageElement, boolean>();
+
 export default class ChatList extends Block {
   constructor(props: ChatListProps) {
     super("ul", {
@@ -23,14 +26,56 @@ export default class ChatList extends Block {
         click: (e: Event) => {
           const target = e.target as HTMLElement;
           const chatCard = target.closest('.chat-card') as HTMLElement;
-          if (chatCard && props.onChatClick) {
-            const chatId = chatCard.getAttribute('data-chat-id');
-            const chat = props.chats.find(c => c.id === chatId);
-            if (chat) {
-              props.onChatClick(chat);
+          if (chatCard) {
+            // Используем текущие props, а не props из конструктора
+            const currentProps = this.props as unknown as ChatListProps;
+            if (currentProps.onChatClick) {
+              const chatId = chatCard.getAttribute('data-chat-id');
+              const chat = currentProps.chats?.find(c => c.id === chatId);
+              if (chat) {
+                currentProps.onChatClick(chat);
+              }
             }
           }
         }
+      }
+    });
+  }
+
+  componentDidUpdate(oldProps: unknown, newProps: unknown): boolean {
+    const oldPropsTyped = oldProps as ChatListProps;
+    const newPropsTyped = newProps as ChatListProps;
+    // Если изменился список чатов, перерисовываем компонент
+    const chatsChanged = oldPropsTyped.chats !== newPropsTyped.chats;
+    const lengthChanged = oldPropsTyped.chats?.length !== newPropsTyped.chats?.length;
+    
+    if (chatsChanged || lengthChanged) {
+      // При обновлении нужно перепривязать обработчики ошибок для новых изображений
+      // Вызываем attachImageErrorHandlers после перерисовки
+      window.setTimeout(() => {
+        this.attachImageErrorHandlers();
+      }, 0);
+      return true;
+    }
+    return false;
+  }
+
+  componentDidMount() {
+    this.attachImageErrorHandlers();
+  }
+
+  private attachImageErrorHandlers() {
+    // Добавляем обработчики ошибок загрузки изображений
+    const images = this._element?.querySelectorAll('img.chat-card__avatar-wrapper_image');
+    images?.forEach((img) => {
+      const imageElement = img as HTMLImageElement;
+      // Проверяем, не привязан ли уже обработчик через WeakMap
+      if (!errorHandlerMap.get(imageElement)) {
+        const errorHandler = () => {
+          imageElement.src = '/images/default-avatar.png';
+        };
+        imageElement.addEventListener('error', errorHandler);
+        errorHandlerMap.set(imageElement, true);
       }
     });
   }

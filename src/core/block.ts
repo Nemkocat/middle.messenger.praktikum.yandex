@@ -3,9 +3,9 @@ import Handlebars from "handlebars";
 
 // Типы для Block
 interface PropsBlock {
-  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  // Используем any здесь, так как props могут содержать любые типы данных
-  // (строки, числа, функции, объекты, компоненты и т.д.)
+  [key: string]: unknown;
+  // Используем unknown вместо any для типобезопасности
+  // Props могут содержать любые типы данных (строки, числа, функции, объекты, компоненты и т.д.)
 }
 
 interface ChildrenBlock {
@@ -79,6 +79,7 @@ export default class Block {
       
       const { tagName, props } = this._meta;
       this._element = this._createDocumentElement(tagName);
+      
       if (typeof props.className === "string") {
         const classes = props.className.split(" ").filter(Boolean);
         if (classes.length > 0) {
@@ -86,9 +87,18 @@ export default class Block {
         }
       }
 
-      if (typeof props.attrs === "object") {
+      if (typeof props.attrs === "object" && props.attrs !== null) {
         Object.entries(props.attrs).forEach(([attrName, attrValue]) => {
+          // Для disabled атрибута: если значение false, удаляем атрибут, иначе устанавливаем
+          if (attrName === 'disabled') {
+            if (attrValue === false || attrValue === 'false' || attrValue === '') {
+              this._element!.removeAttribute('disabled');
+            } else {
+              this._element!.setAttribute(attrName, '');
+            }
+          } else {
           this._element!.setAttribute(attrName, String(attrValue));
+          }
         });
       }
     }
@@ -163,18 +173,30 @@ export default class Block {
   }
 
   _addEvents() {
-    const { events = {} } = this.props;
+    const events = this.props.events;
+    if (!events || typeof events !== 'object') {
+      return;
+    }
 
     Object.keys(events).forEach((eventName) => {
-      this._element!.addEventListener(eventName, events[eventName]);
+      const handler = (events as Record<string, unknown>)[eventName];
+      if (typeof handler === 'function') {
+        this._element!.addEventListener(eventName, handler as EventListener);
+      }
     });
   }
 
   _removeEvents() {
-    const { events = {} } = this.props;
+    const events = this.props.events;
+    if (!events || typeof events !== 'object') {
+      return;
+    }
 
     Object.keys(events).forEach((eventName) => {
-      this._element!.removeEventListener(eventName, events[eventName]);
+      const handler = (events as Record<string, unknown>)[eventName];
+      if (typeof handler === 'function') {
+        this._element!.removeEventListener(eventName, handler as EventListener);
+      }
     });
   }
 
@@ -223,6 +245,7 @@ export default class Block {
 
   _render() {
     this._removeEvents();
+    
     const block = this._compile();
 
     if (this._element!.children.length === 0) {

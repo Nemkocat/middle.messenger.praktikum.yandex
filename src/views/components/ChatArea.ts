@@ -2,6 +2,14 @@ import Block from "../../core/block";
 import Input from "./Input";
 import { Validator } from "../../utils/validation";
 
+interface ChatAreaFormState {
+  message: string;
+}
+
+interface ChatAreaErrors {
+  message: string;
+}
+
 interface ChatAreaProps {
   isEmpty?: boolean;
   chat?: {
@@ -12,10 +20,16 @@ interface ChatAreaProps {
       time: string;
       isMine: boolean;
     }>;
+    id?: string | number;
   };
-  onSubmit?: (e: Event) => void;
+  formState?: ChatAreaFormState;
+  errors?: ChatAreaErrors;
+  onSubmit?: (e: Event, messageContent?: string) => void;
   onFileChange?: (e: Event) => void;
   onMessageChange?: (e: Event) => void;
+  onAddUserClick?: () => void;
+  onRemoveUserClick?: () => void;
+  onDeleteChatClick?: () => void;
 }
 
 export default class ChatArea extends Block {
@@ -58,13 +72,16 @@ export default class ChatArea extends Block {
             });
           }
 
+          const currentFormState = (this.props.formState || { message: "" }) as ChatAreaFormState;
+          const currentErrors = (this.props.errors || { message: "" }) as ChatAreaErrors;
+          
           this.setProps({
             formState: {
-              ...this.props.formState,
+              ...currentFormState,
               message: value
             },
             errors: {
-              ...this.props.errors,
+              ...currentErrors,
               message: validation.isValid ? "" : validation.errorMessage,
             }
           });
@@ -81,9 +98,11 @@ export default class ChatArea extends Block {
             });
           }
 
+          const currentErrors = (this.props.errors || { message: "" }) as ChatAreaErrors;
+          
           this.setProps({
             errors: {
-              ...this.props.errors,
+              ...currentErrors,
               message: validation.isValid ? "" : validation.errorMessage,
             }
           });
@@ -91,15 +110,27 @@ export default class ChatArea extends Block {
       }),
       events: {
         submit: (e: Event) => this.handleSubmit(e),
+        click: (e: Event) => this.handleMenuClick(e),
       },
     });
   }
 
+  private isSubmitting: boolean = false;
+
   handleSubmit(e: Event) {
     e.preventDefault();
+    e.stopPropagation(); // Предотвращаем всплытие события
+    
+    // Защита от повторных вызовов
+    if (this.isSubmitting) {
+      return;
+    }
+    
+    this.isSubmitting = true;
     
     // Валидация поля message при submit
-    const messageValidation = Validator.validate("message", this.props.formState.message);
+    const formState = (this.props.formState || { message: "" }) as ChatAreaFormState;
+    const messageValidation = Validator.validate("message", formState.message);
     
     // Обновляем ошибку
     const messageInput = this.children.MessageInput;
@@ -109,21 +140,29 @@ export default class ChatArea extends Block {
       });
     }
 
+    const currentErrorsForSubmit = (this.props.errors || { message: "" }) as ChatAreaErrors;
+    
     this.setProps({
       errors: {
-        ...this.props.errors,
+        ...currentErrorsForSubmit,
         message: messageValidation.isValid ? "" : messageValidation.errorMessage,
       }
     });
 
     // Если есть ошибки, не отправляем форму
     if (!messageValidation.isValid) {
-      console.log("Message validation error:", messageValidation.errorMessage);
+      this.isSubmitting = false;
       return;
     }
 
     // Если валидация прошла успешно
-    console.log("Message sent:", this.props.formState.message);
+    const formStateForSubmit = (this.props.formState || { message: "" }) as ChatAreaFormState;
+    const messageContent = formStateForSubmit.message;
+    
+    // Вызываем обработчик onSubmit, если он есть, передавая значение сообщения
+    if (this.props.onSubmit && typeof this.props.onSubmit === 'function') {
+      this.props.onSubmit(e, messageContent);
+    }
     
     // Очищаем поле после отправки
     const messageInputForClear = this.children.MessageInput;
@@ -134,16 +173,86 @@ export default class ChatArea extends Block {
       });
     }
 
+    const formStateForClear = (this.props.formState || { message: "" }) as ChatAreaFormState;
+    const errorsForClear = (this.props.errors || { message: "" }) as ChatAreaErrors;
+    
     this.setProps({
       formState: {
-        ...this.props.formState,
+        ...formStateForClear,
         message: ""
       },
       errors: {
-        ...this.props.errors,
+        ...errorsForClear,
         message: "",
       }
     });
+    
+    // Сбрасываем флаг после небольшой задержки
+    window.setTimeout(() => {
+      this.isSubmitting = false;
+    }, 100);
+  }
+
+  handleMenuClick(e: Event) {
+    e.stopPropagation();
+    const target = e.target as HTMLElement;
+    const menuBtn = target.closest('[data-action="menu"]');
+    const menuItem = target.closest('[data-action]');
+    const menu = this._element?.querySelector('.chat-header__menu-dropdown') as HTMLElement;
+    
+    if (menuBtn) {
+      // Переключаем видимость выпадающего меню
+      if (menu) {
+        menu.classList.toggle('chat-header__menu-dropdown--open');
+      }
+      return;
+    }
+    
+    if (menuItem) {
+      const action = menuItem.getAttribute('data-action');
+      
+      if (action === 'add-user' && this.props.onAddUserClick && typeof this.props.onAddUserClick === 'function') {
+        this.props.onAddUserClick();
+        // Закрываем меню
+        if (menu) {
+          menu.classList.remove('chat-header__menu-dropdown--open');
+        }
+      } else if (action === 'remove-user' && this.props.onRemoveUserClick && typeof this.props.onRemoveUserClick === 'function') {
+        this.props.onRemoveUserClick();
+        // Закрываем меню
+        if (menu) {
+          menu.classList.remove('chat-header__menu-dropdown--open');
+        }
+      } else if (action === 'delete-chat' && this.props.onDeleteChatClick && typeof this.props.onDeleteChatClick === 'function') {
+        this.props.onDeleteChatClick();
+        // Закрываем меню
+        if (menu) {
+          menu.classList.remove('chat-header__menu-dropdown--open');
+        }
+      }
+    }
+  }
+
+  componentDidMount() {
+    // Закрываем меню при клике вне его
+    const handleDocumentClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.chat-header__menu')) {
+        const menu = this._element?.querySelector('.chat-header__menu-dropdown') as HTMLElement;
+        if (menu) {
+          menu.classList.remove('chat-header__menu-dropdown--open');
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleDocumentClick);
+    
+    // Сохраняем обработчик для последующего удаления
+    (this as unknown as { _documentClickHandler?: (e: Event) => void })._documentClickHandler = handleDocumentClick;
+  }
+
+  componentDidUpdate(): boolean {
+    return true;
   }
 
   render(): string {
@@ -156,7 +265,7 @@ export default class ChatArea extends Block {
         <div class="chat-header">
           <div class="chat-header__info">
             <div class="chat-header__avatar">
-              <img src="{{chat.avatar}}" alt="Аватар чата">
+              <img src="{{chat.avatar}}" alt="Аватар чата" onerror="this.src='/images/default-avatar.png'">
             </div>
             <div class="chat-header__user-info">
               <h2 class="chat-header__title">{{chat.title}}</h2>
@@ -164,9 +273,20 @@ export default class ChatArea extends Block {
             </div>
           </div>
           <div class="chat-header__menu">
-            <button class="chat-header__menu-btn" type="button">
+            <button class="chat-header__menu-btn" type="button" data-action="menu">
               <span class="chat-header__menu-dots">⋯</span>
             </button>
+            <div class="chat-header__menu-dropdown">
+              <button class="chat-header__menu-item" type="button" data-action="add-user">
+                Добавить пользователя
+              </button>
+              <button class="chat-header__menu-item" type="button" data-action="remove-user">
+                Удалить пользователя
+              </button>
+              <button class="chat-header__menu-item" type="button" data-action="delete-chat">
+                Удалить чат
+              </button>
+            </div>
           </div>
         </div>
         

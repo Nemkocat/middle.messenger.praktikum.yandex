@@ -2,12 +2,35 @@ import Block from "../../../core/block";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import Link from "../../components/Link";
+import AuthController from "../../../controllers/AuthController";
 import { Validator } from "../../../utils/validation";
 import registerTemplate from "./register.hbs?raw";
+
+interface RegisterPageFormState {
+  email: string;
+  login: string;
+  first_name: string;
+  second_name: string;
+  phone: string;
+  password: string;
+  password_repeat: string;
+}
+
+interface RegisterPageErrors {
+  email: string;
+  login: string;
+  first_name: string;
+  second_name: string;
+  phone: string;
+  password: string;
+  password_repeat: string;
+}
 
 interface RegisterPageProps {
   onSubmit?: (e: Event) => void;
   onFieldChange?: (field: string, e: Event) => void;
+  formState?: RegisterPageFormState;
+  errors?: RegisterPageErrors;
 }
 
 export default class RegisterPage extends Block {
@@ -114,7 +137,8 @@ export default class RegisterPage extends Block {
         id: "submit-btn",
         class: "auth-form__btn register-btn",
         text: "Зарегистрироваться",
-        onClick: (e: Event) => this.handleSubmit(e),
+        disabled: true,
+        type: "submit",
       }),
       LoginLink: new Link({
         href: "#",
@@ -128,10 +152,36 @@ export default class RegisterPage extends Block {
     });
   }
 
+  // Проверка валидности всех полей формы
+  private isFormValid(formState: Record<string, string>, errors: Record<string, string>): boolean {
+    const requiredFields = ['email', 'login', 'first_name', 'second_name', 'phone', 'password', 'password_repeat'];
+    
+    // Проверяем, что все обязательные поля заполнены и валидны
+    return requiredFields.every(fieldName => {
+      const value = formState[fieldName];
+      const error = errors[fieldName];
+      return value && value.trim() !== '' && !error;
+    });
+  }
+
+  // Обновление состояния кнопки отправки
+  private updateSubmitButton(formState: Record<string, string>, errors: Record<string, string>) {
+    const submitButton = this.children.SubmitButton;
+    if (submitButton && !Array.isArray(submitButton)) {
+      const isValid = this.isFormValid(formState, errors);
+      submitButton.setProps({
+        disabled: !isValid,
+      });
+    }
+  }
+
   handleFieldChange(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий Input компонент
     const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
@@ -144,18 +194,21 @@ export default class RegisterPage extends Block {
 
     // Обновляем состояние формы
     const newFormState = {
-      ...this.props.formState,
+      ...currentFormState,
       [fieldName]: value
-    };
+    } as RegisterPageFormState;
 
+    const currentErrors = (this.props.errors || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageErrors;
     const newErrors = {
-      ...this.props.errors,
+      ...currentErrors,
       [fieldName]: validation.isValid ? "" : validation.errorMessage,
-    };
+    } as RegisterPageErrors;
 
     // Если изменился основной пароль, перевалидируем повторный пароль
-    if (fieldName === "password" && this.props.formState.password_repeat) {
-      const passwordRepeatValidation = Validator.validate("password_repeat", this.props.formState.password_repeat, newFormState);
+    if (fieldName === "password" && currentFormState.password_repeat) {
+      const passwordRepeatValidation = Validator.validate("password_repeat", currentFormState.password_repeat, newFormState as unknown as Record<string, string>);
       newErrors.password_repeat = passwordRepeatValidation.isValid ? "" : passwordRepeatValidation.errorMessage;
       
       // Обновляем компонент повторного пароля
@@ -168,8 +221,8 @@ export default class RegisterPage extends Block {
     }
 
     // Если изменился повторный пароль, перевалидируем основной пароль
-    if (fieldName === "password_repeat" && this.props.formState.password) {
-      const passwordValidation = Validator.validate("password", this.props.formState.password, newFormState);
+    if (fieldName === "password_repeat" && currentFormState.password) {
+      const passwordValidation = Validator.validate("password", currentFormState.password, newFormState as unknown as Record<string, string>);
       newErrors.password = passwordValidation.isValid ? "" : passwordValidation.errorMessage;
       
       // Обновляем компонент основного пароля
@@ -185,12 +238,18 @@ export default class RegisterPage extends Block {
       formState: newFormState,
       errors: newErrors
     });
+
+    // Обновляем состояние кнопки отправки
+    this.updateSubmitButton(newFormState as unknown as Record<string, string>, newErrors as unknown as Record<string, string>);
   }
 
   handleFieldBlur(fieldName: string, e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const validation = Validator.validate(fieldName, value, this.props.formState);
+    const currentFormState = (this.props.formState || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageFormState;
+    const validation = Validator.validate(fieldName, value, currentFormState as unknown as Record<string, string>);
     
     // Обновляем соответствующий Input компонент
     const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
@@ -200,54 +259,131 @@ export default class RegisterPage extends Block {
       });
     }
 
-    this.setProps({
-      errors: {
-        ...this.props.errors,
-        [fieldName]: validation.isValid ? "" : validation.errorMessage,
-      }
-    });
-  }
-
-  handleSubmit(e: Event) {
-    e.preventDefault();
-    
-    // Валидация всех полей при submit
-    const fields = ['email', 'login', 'first_name', 'second_name', 'phone', 'password', 'password_repeat'];
-    let hasErrors = false;
-    const newErrors: Record<string, string> = {};
-
-    fields.forEach(fieldName => {
-      const value = this.props.formState[fieldName];
-      const validation = Validator.validate(fieldName, value, this.props.formState);
-      
-      if (!validation.isValid) {
-        hasErrors = true;
-        newErrors[fieldName] = validation.errorMessage;
-        
-        // Обновляем соответствующий Input компонент
-        const inputComponent = this.children[`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`];
-        if (inputComponent && !Array.isArray(inputComponent)) {
-          inputComponent.setProps({
-            error: validation.errorMessage,
-          });
-        }
-      } else {
-        newErrors[fieldName] = "";
-      }
-    });
+    const currentErrors = (this.props.errors || {
+      email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+    }) as RegisterPageErrors;
+    const newErrors = {
+      ...currentErrors,
+      [fieldName]: validation.isValid ? "" : validation.errorMessage,
+    } as RegisterPageErrors;
 
     this.setProps({
       errors: newErrors
     });
 
-    // Если есть ошибки, не отправляем форму
-    if (hasErrors) {
-      console.log("Form has validation errors");
+    // Обновляем состояние кнопки отправки
+    this.updateSubmitButton(currentFormState as unknown as Record<string, string>, newErrors as unknown as Record<string, string>);
+  }
+
+  private isSubmitting: boolean = false;
+
+  async handleSubmit(e: Event) {
+    e.preventDefault();
+    e.stopPropagation(); // Предотвращаем всплытие события
+    
+    // Защита от повторных вызовов
+    if (this.isSubmitting) {
       return;
     }
+    
+    this.isSubmitting = true;
+    
+    // Блокируем кнопку отправки, чтобы предотвратить повторные запросы
+    const submitButton = this.children.SubmitButton;
+    if (submitButton && !Array.isArray(submitButton)) {
+      submitButton.setProps({
+        text: 'Регистрация...',
+        disabled: true,
+      });
+    }
 
-    // Если валидация прошла успешно
-    console.log("Form Data:", this.props.formState);
+    try {
+      // Вызываем контроллер - валидация и навигация внутри контроллера
+      const formState = (this.props.formState || {
+        email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+      }) as RegisterPageFormState;
+      const result = await AuthController.signUp({
+        first_name: formState.first_name,
+        second_name: formState.second_name,
+        login: formState.login,
+        email: formState.email,
+        password: formState.password,
+        phone: formState.phone,
+        password_repeat: formState.password_repeat,
+      });
+      
+      // Если валидация не прошла, показываем ошибки в UI
+      if (!result.isValid && result.errors) {
+        const newErrors: Record<string, string> = {};
+        
+        // Обновляем ошибки в компонентах
+        Object.entries(result.errors).forEach(([fieldName, errorMessage]) => {
+          newErrors[fieldName] = errorMessage;
+          
+          // Обновляем соответствующий Input компонент
+          const componentName = fieldName === 'password_repeat' 
+            ? 'PasswordRepeatInput' 
+            : `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}Input`;
+          const inputComponent = this.children[componentName];
+          if (inputComponent && !Array.isArray(inputComponent)) {
+            inputComponent.setProps({
+              error: errorMessage,
+            });
+          }
+        });
+        
+        this.setProps({
+          errors: newErrors
+        });
+      }
+      // Если валидация прошла, контроллер сам сделает навигацию
+    } catch (error) {
+      console.error('Registration error:', error);
+      // Показываем ошибку пользователю
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка регистрации';
+      
+      // Определяем, какое поле показать ошибку (login или email)
+      const isLoginError = errorMessage.toLowerCase().includes('login') || 
+                          errorMessage.toLowerCase().includes('логин');
+      
+      const currentErrors = (this.props.errors || {
+        email: "", login: "", first_name: "", second_name: "", phone: "", password: "", password_repeat: ""
+      }) as RegisterPageErrors;
+      
+      this.setProps({
+        errors: {
+          ...currentErrors,
+          [isLoginError ? 'login' : 'email']: errorMessage,
+        }
+      });
+      
+      // Показываем ошибку в соответствующем поле
+      if (isLoginError) {
+        const usernameInput = this.children.UsernameInput;
+        if (usernameInput && !Array.isArray(usernameInput)) {
+          usernameInput.setProps({
+            error: errorMessage,
+          });
+        }
+      } else {
+        const emailInput = this.children.EmailInput;
+        if (emailInput && !Array.isArray(emailInput)) {
+          emailInput.setProps({
+            error: errorMessage,
+          });
+        }
+      }
+    } finally {
+      // Разблокируем кнопку отправки
+      if (submitButton && !Array.isArray(submitButton)) {
+        submitButton.setProps({
+          text: 'Зарегистрироваться',
+          disabled: false,
+        });
+      }
+      // Сбрасываем флаг после завершения
+      this.isSubmitting = false;
+    }
   }
 
   render(): string {
