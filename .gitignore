@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+build
 dist-ssr
 *.local
 
@@ -23,3 +24,8 @@ dist-ssr
 *.sln
 *.sw?
 
+# Helper files for me
+
+.dev-example
+dev-example/
+.dev-example/

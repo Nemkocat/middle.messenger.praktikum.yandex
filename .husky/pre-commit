@@ -1,0 +1,2 @@
+npm-run-all -s test lint:all
+
