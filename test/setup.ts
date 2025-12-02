@@ -25,8 +25,10 @@ const dom = new JSDOM('<!DOCTYPE html><html><body><div id="app"></div></body></h
 // navigator уже существует в JSDOM, не нужно переопределять
 
 // Расширяем Window для поддержки window.router
+import { Router } from '../src/core/router.js';
+
 declare global {
   interface Window {
-    router?: any;
+    router?: Router;
   }
 }
