@@ -29,10 +29,10 @@ interface EditProfileErrors {
 }
 
 export default class EditProfilePage extends Block {
-  constructor(props: object = {}) {
+  constructor(tagName?: string, props?: Record<string, unknown>) {
     const user = AuthController.getUser();
-    super("div", {
-      ...props,
+    super(tagName || "div", {
+      ...(props || {}),
       formState: {
         email: user?.email || "",
         login: user?.login || "",

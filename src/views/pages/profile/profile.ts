@@ -7,15 +7,15 @@ import { RESOURCES_BASE_URL } from "../../../config";
 import profileTemplate from "./profile.hbs?raw";
 
 export default class ProfilePage extends Block {
-  constructor(props: object = {}) {
+  constructor(tagName?: string, props?: Record<string, unknown>) {
     const user = AuthController.getUser();
     const avatarUrl = user?.avatar 
       ? `${RESOURCES_BASE_URL}${user.avatar}` 
       : "/images/default-avatar.png";
     
-    super("div", {
+    super(tagName || "div", {
       user: user,
-      ...props,
+      ...(props || {}),
       AvatarComponent: new Avatar({
         class: "profile-data__avatar",
         name: "avatar",

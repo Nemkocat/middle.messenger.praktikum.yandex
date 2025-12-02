@@ -3,9 +3,9 @@ import Link from "../../components/Link";
 import error500Template from "./500.hbs?raw";
 
 export default class Error500Page extends Block {
-  constructor(props: object = {}) {
-    super("div", {
-      ...props,
+  constructor(tagName?: string, props?: Record<string, unknown>) {
+    super(tagName || "div", {
+      ...(props || {}),
       className: "container",
       BackLink: new Link({
         href: "#",

@@ -20,9 +20,9 @@ interface EditPasswordErrors {
 }
 
 export default class EditPasswordPage extends Block {
-  constructor(props: object = {}) {
-    super("div", {
-      ...props,
+  constructor(tagName?: string, props?: Record<string, unknown>) {
+    super(tagName || "div", {
+      ...(props || {}),
       formState: {
         oldPassword: "",
         newPassword: "",

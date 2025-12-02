@@ -2,7 +2,7 @@ import { Route } from "./route";
 import Block from "./block";
 import AuthController from "../controllers/AuthController";
 
-type BlockConstructor = new (props?: Record<string, unknown>) => Block;
+type BlockConstructor = new (tagName?: string, props?: Record<string, unknown>) => Block;
 type BlockFactory = () => Block;
 
 // Маршруты, которые доступны без авторизации
