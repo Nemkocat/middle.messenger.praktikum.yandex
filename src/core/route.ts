@@ -5,7 +5,7 @@ interface RouteProps {
   rootQuery: string;
 }
 
-type BlockConstructor = new (props?: Record<string, unknown>) => Block;
+type BlockConstructor = new (tagName?: string, props?: Record<string, unknown>) => Block;
 type BlockFactory = () => Block;
 
 function isEqual(lhs: string, rhs: string): boolean {

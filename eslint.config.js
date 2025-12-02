@@ -25,6 +25,7 @@ export default [
         Event: 'readonly',
         XMLHttpRequest: 'readonly',
         URLSearchParams: 'readonly',
+        global: 'readonly',
       },
     },
     plugins: {
@@ -40,6 +41,26 @@ export default [
       'no-var': 'error',
       'no-console': 'off',
       'no-debugger': 'warn',
+    },
+  },
+  {
+    files: ['**/*.spec.ts', 'test/**/*.ts'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        before: 'readonly',
+        after: 'readonly',
+        expect: 'readonly',
+        global: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-this-alias': 'off',
     },
   },
   {

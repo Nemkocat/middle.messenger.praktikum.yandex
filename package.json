@@ -8,21 +8,35 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "npm run lint && npm run lint:styles && vite build && vite preview",
+    "test": "mocha",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "lint:styles": "stylelint src/**/*.{css,scss}",
-    "lint:styles:fix": "stylelint src/**/*.{css,scss} --fix"
+    "lint:styles:fix": "stylelint src/**/*.{css,scss} --fix",
+    "lint:all": "npm run lint && npm run lint:styles",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.18",
     "@types/handlebars": "^4.0.40",
+    "@types/jsdom": "^27.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.7.2",
+    "@types/sinon": "^21.0.0",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
+    "chai": "^4.4.1",
     "eslint": "^9.38.0",
     "handlebars": "^4.7.8",
+    "husky": "^9.1.7",
+    "jsdom": "^27.2.0",
+    "mocha": "^10.7.3",
+    "npm-run-all": "^4.1.5",
     "sass": "^1.91.0",
+    "sinon": "^21.0.0",
     "stylelint": "^16.25.0",
     "stylelint-config-standard-scss": "^16.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vite": "^7.1.4",
     "vite-plugin-handlebars": "^2.0.0"
@@ -32,4 +46,3 @@
     "npm": "10.9.3"
   }
 }
-

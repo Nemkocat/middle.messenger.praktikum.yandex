@@ -5,7 +5,7 @@ export type PropsBlock = Record<string, unknown>;
 // Используем unknown вместо any для типобезопасности
 
 export interface BlockConstructable<P = PropsBlock> {
-  new (props?: P): Block;
+  new (tagName?: string, props?: P): Block;
 }
 
 // Функция для регистрации компонентов с любыми типами props
@@ -33,7 +33,9 @@ export default function registerComponent<Props extends Record<string, unknown> 
        */
       (Object.keys(hash) as Array<keyof Props>).forEach((key: keyof Props) => {
         // Используем явное приведение типа для Object.keys с generic типами
-        const value = this[key];
+        // Пробуем получить значение из this (контекст родительского шаблона)
+        // Если не найдено, пробуем из data.root (корневой контекст)
+        const value = this[key] || (data.root as Record<string, unknown>)[String(key)];
         const hashValue = hash[key];
         if (value && typeof value === "string" && typeof hashValue === "string") {
           hash[key] = hashValue.replace(
@@ -43,7 +45,7 @@ export default function registerComponent<Props extends Record<string, unknown> 
         }
       });
 
-      const component = new Component(hash);
+      const component = new Component('div', hash);
 
       // Prevent using null as index type
       if (component.id != null) {
