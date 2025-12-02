@@ -1,0 +1,25 @@
+<main class="flex-wrapper">
+    <div class="chats-menu">
+        <nav class="chats-menu-nav">
+
+            <div class="chats-menu-nav__controls">
+                <button class="chats-menu-nav__create-chat-btn pointer">Добавить чат</button>
+                {{{ ProfileLink }}}
+            </div>
+            
+            <form class="chats-menu-nav__form">
+                {{{ SearchInput }}}
+            </form>
+        </nav>
+            {{{ ChatListComponent }}}
+    </div>
+
+    <div class="picked-chat">
+        {{{ ChatAreaComponent }}}
+    </div>
+    {{{ CreateChatModal }}}
+    {{{ DeleteChatModal }}}
+    {{{ AddUserModal }}}
+    {{{ RemoveUserModal }}}
+</main>
+
