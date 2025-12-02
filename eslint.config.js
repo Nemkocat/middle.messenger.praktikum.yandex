@@ -46,6 +46,12 @@ export default [
   {
     files: ['**/*.spec.ts', 'test/**/*.ts'],
     languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: './tsconfig.json',
+      },
       globals: {
         describe: 'readonly',
         it: 'readonly',
